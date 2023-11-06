@@ -338,27 +338,6 @@
             "outputs": {}
         },
         "parameters": {},
-        "connections": {
-            "SentinelTriageAssistant": {
-                "id": "/subscriptions/0000-0000/resourceGroups/SentinelTest/providers/Microsoft.Web/customApis/SentinelTriageAssistant",
-                "connectionId": "",
-                "connectionName": ""
-            },
-            "azuresentinel": {
-                "id": "/subscriptions/0000-0000/providers/Microsoft.Web/locations/germanywestcentral/managedApis/azuresentinel",
-                "connectionId": "",
-                "connectionName": ""
-            },
-            "azuresentinel_1": {
-                "id": "/subscriptions/0000-0000/providers/Microsoft.Web/locations/germanywestcentral/managedApis/azuresentinel",
-                "connectionId": "",
-                "connectionName": ""
-            },
-            "teams": {
-                "id": "/subscriptions/0000-0000/providers/Microsoft.Web/locations/germanywestcentral/managedApis/teams",
-                "connectionId": "",
-                "connectionName": ""
-            }
-        }
+        "connections": {}
     }
 }
