@@ -1,0 +1,364 @@
+{
+    "id": "Usecase4",
+    "title": "Usecase4",
+    "description": "Anomalous Login",
+    "iconType": "Event",
+    "skuType": "Consumption",
+    "data": {
+        "definition": {
+            "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+            "contentVersion": "1.0.0.0",
+            "parameters": {
+                "$connections": {
+                    "defaultValue": {},
+                    "type": "Object"
+                }
+            },
+            "triggers": {
+                "Microsoft_Sentinel_incident": {
+                    "type": "ApiConnectionWebhook",
+                    "inputs": {
+                        "body": {
+                            "callback_url": "@{listCallbackUrl()}"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                            }
+                        },
+                        "path": "/incident-creation"
+                    }
+                }
+            },
+            "actions": {
+                "Add_comment_to_incident_(V3)": {
+                    "runAfter": {
+                        "Initialize_variable_-_Check_answer_boolean": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": {
+                            "incidentArmId": "@triggerBody()?['object']?['id']",
+                            "message": "<p>Teams message sent to user @{body('Entities_-_Get_Accounts')?['Accounts']?[0]?['accountName']} - @{body('Entities_-_Get_Accounts')?['Accounts']?[0]?['additionalData']?['UserPrincipalName']} at<br>\n@{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}.<br>\nWaiting...</p>"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azuresentinel_1']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/Incidents/Comment"
+                    }
+                },
+                "Base_Module": {
+                    "runAfter": {},
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": {
+                            "AddAccountComments": false,
+                            "Entities": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                            "IncidentARMId": "@triggerBody()?['object']?['id']",
+                            "WorkspaceId": "@triggerBody()?['workspaceId']"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/workflows/415fc04185b8410385b4937c50c43447/triggers/manual/paths/invoke/func/base",
+                        "queries": {
+                            "api-version": "2016-10-01",
+                            "sig": "LqM7i1KgUaT1yjBiz_cDkk2BCbAJqj7FxjydJTU4sAs",
+                            "sp": "/triggers/manual/run",
+                            "sv": "1.0"
+                        }
+                    }
+                },
+                "Compose": {
+                    "runAfter": {
+                        "Base_Module": [
+                            "Succeeded"
+                        ],
+                        "Entities_-_Get_Accounts": [
+                            "Succeeded"
+                        ],
+                        "Entities_-_Get_IPs": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Compose",
+                    "inputs": {
+                        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                        "actions": [
+                            {
+                                "data": {
+                                    "x": "confirm"
+                                },
+                                "title": "Submit response!",
+                                "type": "Action.Submit"
+                            }
+                        ],
+                        "body": [
+                            {
+                                "size": "Small",
+                                "style": "Person",
+                                "type": "Image",
+                                "url": "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                            },
+                            {
+                                "size": "Large",
+                                "text": "Incident: Anomalous login followed by a Teams action",
+                                "type": "TextBlock",
+                                "wrap": true
+                            },
+                            {
+                                "spacing": "Medium",
+                                "text": "Dear @{body('Entities_-_Get_Accounts')?['Accounts']?[0]?['accountName']},\n\nWe detected that you suspiciously logged-in at location **@{body('Base_Module')?['IPs']?[0]?['GeoData']?['city']}, @{body('Base_Module')?['IPs']?[0]?['GeoData']?['country']}** around date and time @{convertTimeZone(triggerBody()?['object']?['properties']?['CreatedTimeUtc'], 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}.\n\nWere your responsible for this log-in? If yes, please provide a business reasoning for these actions.\n\nKind regards,\nyour Incident Response team.",
+                                "type": "TextBlock",
+                                "wrap": true
+                            },
+                            {
+                                "size": "Large",
+                                "spacing": "Large",
+                                "text": "Response:",
+                                "type": "TextBlock",
+                                "weight": "Bolder"
+                            },
+                            {
+                                "choices": [
+                                    {
+                                        "title": "Yes",
+                                        "value": "yes"
+                                    },
+                                    {
+                                        "title": "No",
+                                        "value": "no"
+                                    }
+                                ],
+                                "errorMessage": "Please answer the question!",
+                                "id": "verification",
+                                "isRequired": true,
+                                "label": "Did u log-in at this location?",
+                                "style": "expanded",
+                                "type": "Input.ChoiceSet"
+                            },
+                            {
+                                "id": "reason",
+                                "isMultiline": true,
+                                "label": "If 'yes': please provide a short reasoning:",
+                                "maxLength": 0,
+                                "placeholder": "Type your text here...",
+                                "type": "Input.Text"
+                            }
+                        ],
+                        "type": "AdaptiveCard",
+                        "version": "1.3"
+                    }
+                },
+                "Condition": {
+                    "actions": {},
+                    "runAfter": {
+                        "Set_variable_-_set_to_true": [
+                            "Succeeded"
+                        ]
+                    },
+                    "expression": {
+                        "and": [
+                            {
+                                "equals": [
+                                    "@body('Post_adaptive_card_and_wait_for_a_response')?['data']['verification']",
+                                    "yes"
+                                ]
+                            }
+                        ]
+                    },
+                    "type": "If"
+                },
+                "Entities_-_Get_Accounts": {
+                    "runAfter": {},
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azuresentinel_1']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/entities/account"
+                    }
+                },
+                "Entities_-_Get_IPs": {
+                    "runAfter": {},
+                    "type": "ApiConnection",
+                    "inputs": {
+                        "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['azuresentinel_1']['connectionId']"
+                            }
+                        },
+                        "method": "post",
+                        "path": "/entities/ip"
+                    }
+                },
+                "Initialize_variable_-_Check_answer_boolean": {
+                    "runAfter": {
+                        "Compose": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "InitializeVariable",
+                    "inputs": {
+                        "variables": [
+                            {
+                                "name": "ApprovalResponse",
+                                "type": "boolean",
+                                "value": false
+                            }
+                        ]
+                    }
+                },
+                "Post_adaptive_card_and_wait_for_a_response": {
+                    "runAfter": {
+                        "Add_comment_to_incident_(V3)": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "ApiConnectionWebhook",
+                    "inputs": {
+                        "body": {
+                            "body": {
+                                "messageBody": "@{outputs('Compose')}",
+                                "recipient": {
+                                    "to": "@{body('Entities_-_Get_Accounts')?['Accounts']?[0]?['additionalData']?['UserPrincipalName']}"
+                                },
+                                "updateMessage": "Thanks for your response!"
+                            },
+                            "notificationUrl": "@{listCallbackUrl()}"
+                        },
+                        "host": {
+                            "connection": {
+                                "name": "@parameters('$connections')['teams']['connectionId']"
+                            }
+                        },
+                        "path": "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                    }
+                },
+                "Set_variable_-_set_to_true": {
+                    "runAfter": {
+                        "Post_adaptive_card_and_wait_for_a_response": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "SetVariable",
+                    "inputs": {
+                        "name": "ApprovalResponse",
+                        "value": true
+                    }
+                },
+                "Terminate_-_make_sure_the_Until_loop_ends": {
+                    "runAfter": {
+                        "Condition": [
+                            "Succeeded"
+                        ]
+                    },
+                    "type": "Terminate",
+                    "inputs": {
+                        "runStatus": "Succeeded"
+                    }
+                },
+                "Until_-_Teams_message_has_been_answered_(max._3)": {
+                    "actions": {
+                        "Condition_-_extra_check": {
+                            "actions": {
+                                "Post_message_in_a_chat_or_channel": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "isAlert": true,
+                                            "messageBody": "<p><span style=\"font-size: 16px\"><strong>REMINDER</strong></span><br>\nPlease respond to the question!</p>",
+                                            "recipient": "@{body('Entities_-_Get_Accounts')?['Accounts']?[0]?['additionalData']?['UserPrincipalName']}"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['teams']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Delay_-_x_amount_of_time_between_reminders": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "equals": [
+                                            "@variables('ApprovalResponse')",
+                                            false
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "Delay_-_x_amount_of_time_between_reminders": {
+                            "runAfter": {},
+                            "type": "Wait",
+                            "inputs": {
+                                "interval": {
+                                    "count": 1,
+                                    "unit": "Minute"
+                                }
+                            }
+                        }
+                    },
+                    "runAfter": {
+                        "Add_comment_to_incident_(V3)": [
+                            "Succeeded"
+                        ]
+                    },
+                    "expression": "@equals(variables('ApprovalResponse'), true)",
+                    "limit": {
+                        "count": 3,
+                        "timeout": "PT1H"
+                    },
+                    "type": "Until"
+                }
+            },
+            "outputs": {}
+        },
+        "parameters": {},
+        "connections": {
+            "SentinelTriageAssistant": {
+                "id": "/subscriptions/0000-0000/resourceGroups/SentinelTest/providers/Microsoft.Web/customApis/SentinelTriageAssistant",
+                "connectionId": "",
+                "connectionName": ""
+            },
+            "azuresentinel": {
+                "id": "/subscriptions/0000-0000/providers/Microsoft.Web/locations/germanywestcentral/managedApis/azuresentinel",
+                "connectionId": "",
+                "connectionName": ""
+            },
+            "azuresentinel_1": {
+                "id": "/subscriptions/0000-0000/providers/Microsoft.Web/locations/germanywestcentral/managedApis/azuresentinel",
+                "connectionId": "",
+                "connectionName": ""
+            },
+            "teams": {
+                "id": "/subscriptions/0000-0000/providers/Microsoft.Web/locations/germanywestcentral/managedApis/teams",
+                "connectionId": "",
+                "connectionName": ""
+            }
+        }
+    }
+}
