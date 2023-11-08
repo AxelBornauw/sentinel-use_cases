@@ -28,6 +28,9 @@
         }
     },
     "variables":  {
+        "AzureadConnectionName":  "[concat('Azuread-', parameters('PlaybookName'))]",
+        "MicrosoftSentinelConnectionName":  "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
+        "TeamsConnectionName":  "[concat('Teams-', parameters('PlaybookName'))]"
     },
     "resources":  [
         {
@@ -52,6 +55,9 @@
                                     "callback_url":  "@{listCallbackUrl()}"
                                 },
                                 "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
                                 },
                                 "path":  "/incident-creation"
                             }
@@ -68,9 +74,12 @@
                             "inputs":  {
                                 "body":  {
                                     "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                    "message":  "\u003cp\u003eTeams message sent to user @{body('Entities_-_Get_Accounts')?['Accounts']?[0]?['accountName']} - @{body('Entities_-_Get_Accounts')?['Accounts']?[0]?['additionalData']?['UserPrincipalName']} at\u003cbr\u003e\n@{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}.\u003cbr\u003e\nWaiting...\u003c/p\u003e"
+                                    "message":  "\u003cp\u003eTeams message sent to user @{body('Get_user')?['displayName']} - @{body('Get_user')?['mail']} at\u003cbr\u003e\n@{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}.\u003cbr\u003e\nWaiting...\u003c/p\u003e"
                                 },
                                 "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
                                 },
                                 "method":  "post",
                                 "path":  "/Incidents/Comment"
@@ -78,7 +87,7 @@
                         },
                         "Compose":  {
                             "runAfter":  {
-                                "Entities_-_Get_Accounts":  [
+                                "Get_user":  [
                                     "Succeeded"
                                 ],
                                 "Parse_JSON":  [
@@ -112,7 +121,7 @@
                                     },
                                     {
                                         "spacing":  "Medium",
-                                        "text":  "Dear @{body('Entities_-_Get_Accounts')?['Accounts']?[0]?['accountName']},\n\nWe detected that your user account sent x amount of data to application @{body('Parse_JSON')?[0]?['properties']?['appName']} around date and time @{convertTimeZone(triggerBody()?['object']?['properties']?['CreatedTimeUtc'], 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}.\n\nDid you perform these actions? If yes, please provide a business reasoning for these actions.\n\nKind regards,\nyour Incident Response team.",
+                                        "text":  "Dear @{body('Get_user')?['displayName']},\n\nWe detected that your user account sent x amount of data to application @{body('Parse_JSON')?[0]?['properties']?['appName']} around date and time @{convertTimeZone(triggerBody()?['object']?['properties']?['CreatedTimeUtc'], 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}.\n\nDid you perform these actions? If yes, please provide a business reasoning for these actions.\n\nKind regards,\nyour Incident Response team.",
                                         "type":  "TextBlock",
                                         "wrap":  true
                                     },
@@ -166,6 +175,9 @@
                                             "message":  "\u003cp\u003e\u003cspan style=\"font-size: 16px\"\u003e\u003cstrong\u003eFALSE POSITIVE\u003c/strong\u003e\u003c/span\u003e\u003cbr\u003e\nTeams message received at @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}. User confirmed he was responsible. The reason:\u003cbr\u003e\n@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['reason']}\u003c/p\u003e"
                                         },
                                         "host":  {
+                                            "connection":  {
+                                                "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                            }
                                         },
                                         "method":  "post",
                                         "path":  "/Incidents/Comment"
@@ -191,6 +203,9 @@
                                             }
                                         },
                                         "host":  {
+                                            "connection":  {
+                                                "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                            }
                                         },
                                         "method":  "put",
                                         "path":  "/Incidents"
@@ -217,6 +232,9 @@
                                                 "message":  "\u003cp\u003e\u003cspan style=\"font-size: 16px\"\u003e\u003cstrong\u003eWARNING\u003c/strong\u003e\u003c/span\u003e\u003cbr\u003e\nTeams message received at @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}. user does \u003cstrong\u003enot \u003c/strong\u003eclaim to be responsible. Further triaging and investigation is required.\u003c/p\u003e"
                                             },
                                             "host":  {
+                                                "connection":  {
+                                                    "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                                }
                                             },
                                             "method":  "post",
                                             "path":  "/Incidents/Comment"
@@ -242,6 +260,9 @@
                                                 }
                                             },
                                             "host":  {
+                                                "connection":  {
+                                                    "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                                }
                                             },
                                             "method":  "put",
                                             "path":  "/Incidents"
@@ -268,6 +289,9 @@
                             "inputs":  {
                                 "body":  "@triggerBody()?['object']?['properties']?['relatedEntities']",
                                 "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
                                 },
                                 "method":  "post",
                                 "path":  "/entities/account"
@@ -283,6 +307,23 @@
                             "inputs":  {
                                 "from":  "@variables('Entities')",
                                 "where":  "@equals(item()?['kind'], 'CloudApplication')"
+                            }
+                        },
+                        "Get_user":  {
+                            "runAfter":  {
+                                "Entities_-_Get_Accounts":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "ApiConnection",
+                            "inputs":  {
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azuread']['connectionId']"
+                                    }
+                                },
+                                "method":  "get",
+                                "path":  "/v1.0/users/@{encodeURIComponent(body('Entities_-_Get_Accounts')?['Accounts']?[0]?['aadUserID'])}"
                             }
                         },
                         "Initialize_variable_-_Entities_array":  {
@@ -362,11 +403,17 @@
                                 "body":  {
                                     "body":  {
                                         "messageBody":  "@{outputs('Compose')}",
+                                        "recipient":  {
+                                            "to":  "@body('Get_user')?['mail']"
+                                        },
                                         "updateMessage":  "Thanks for your response!"
                                     },
                                     "notificationUrl":  "@{listCallbackUrl()}"
                                 },
                                 "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                    }
                                 },
                                 "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
                             }
@@ -390,6 +437,9 @@
                                     }
                                 },
                                 "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
                                 },
                                 "method":  "put",
                                 "path":  "/Incidents"
@@ -400,21 +450,95 @@
                     }
                 },
                 "parameters":  {
+                    "$connections":  {
+                        "value":  {
+                            "azuread":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
+                                "connectionName":  "[variables('AzureadConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
+                            },
+                            "azuresentinel":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                                "connectionName":  "[variables('MicrosoftSentinelConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
+                                "connectionProperties":  {
+                                    "authentication":  {
+                                        "type":  "ManagedServiceIdentity"
+                                    }
+                                }
+                            },
+                            "teams":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
+                                "connectionName":  "[variables('TeamsConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+                            }
+                        }
+                    }
                 }
             },
             "name":  "[parameters('PlaybookName')]",
             "type":  "Microsoft.Logic/workflows",
             "location":  "[resourceGroup().location]",
-            "identity":  {
-                "type":  "SystemAssigned"
-            },
             "tags":  {
+                "use case":  "3",
                 "hidden-SentinelTemplateName":  "UnsanctionedApp",
                 "hidden-SentinelTemplateVersion":  "1.0"
             },
+            "identity":  {
+                "type":  "SystemAssigned"
+            },
             "apiVersion":  "2017-07-01",
             "dependsOn":  [
+                "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
+                "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]"
             ]
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('AzureadConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('AzureadConnectionName')]",
+                "customParameterValues":  {
+                },
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
+                }
+            }
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('MicrosoftSentinelConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('MicrosoftSentinelConnectionName')]",
+                "customParameterValues":  {
+                },
+                "parameterValueType":  "Alternative",
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
+                }
+            }
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('TeamsConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('TeamsConnectionName')]",
+                "customParameterValues":  {
+                },
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+                }
+            }
         }
     ]
 }
