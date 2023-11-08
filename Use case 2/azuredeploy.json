@@ -1,741 +1,727 @@
 {
-    "$schema":  "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion":  "1.0.0.0",
-    "metadata":  {
-        "title":  "",
-        "description":  "",
-        "prerequisites":  "",
-        "postDeployment":  [
-        ],
-        "prerequisitesDeployTemplateFile":  "",
-        "lastUpdateTime":  "",
-        "entities":  [
-        ],
-        "tags":  [
-        ],
-        "support":  {
-            "tier":  "community",
-            "armtemplate":  "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator"
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+        "title": "",
+        "description": "",
+        "prerequisites": "",
+        "postDeployment": [],
+        "prerequisitesDeployTemplateFile": "",
+        "lastUpdateTime": "",
+        "entities": [],
+        "tags": [],
+        "support": {
+            "tier": "community",
+            "armtemplate": "Generated from https://github.com/Azure/Azure-Sentinel/tree/master/Tools/Playbook-ARM-Template-Generator"
         },
-        "author":  {
-            "name":  ""
+        "author": {
+            "name": ""
         }
     },
-    "parameters":  {
-        "PlaybookName":  {
-            "defaultValue":  "MultipleLoginsFailed",
-            "type":  "string"
+    "parameters": {
+        "PlaybookName": {
+            "defaultValue": "MultipleLoginsFailed",
+            "type": "string"
         }
     },
-    "variables":  {
-        "SentineltriageassistantConnectionName":  "[concat('Sentineltriageassistant-', parameters('PlaybookName'))]",
-        "AzureadConnectionName":  "[concat('Azuread-', parameters('PlaybookName'))]",
-        "AzuremonitorlogsConnectionName":  "[concat('Azuremonitorlogs-', parameters('PlaybookName'))]",
-        "MicrosoftSentinelConnectionName":  "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
-        "TeamsConnectionName":  "[concat('Teams-', parameters('PlaybookName'))]"
+    "variables": {
+        "SentineltriageassistantConnectionName": "SentinelTriageAssistant",
+        "AzureadConnectionName": "[concat('Azuread-', parameters('PlaybookName'))]",
+        "AzuremonitorlogsConnectionName": "[concat('Azuremonitorlogs-', parameters('PlaybookName'))]",
+        "MicrosoftSentinelConnectionName": "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
+        "TeamsConnectionName": "[concat('Teams-', parameters('PlaybookName'))]"
     },
-    "resources":  [
+    "resources": [
         {
-            "properties":  {
-                "provisioningState":  "Succeeded",
-                "state":  "Enabled",
-                "definition":  {
-                    "$schema":  "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion":  "1.0.0.0",
-                    "parameters":  {
-                        "$connections":  {
-                            "defaultValue":  {
-                            },
-                            "type":  "Object"
+            "properties": {
+                "provisioningState": "Succeeded",
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
                         }
                     },
-                    "triggers":  {
-                        "Microsoft_Sentinel_incident":  {
-                            "type":  "ApiConnectionWebhook",
-                            "inputs":  {
-                                "body":  {
-                                    "callback_url":  "@{listCallbackUrl()}"
+                    "triggers": {
+                        "Microsoft_Sentinel_incident": {
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "body": {
+                                    "callback_url": "@{listCallbackUrl()}"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
-                                "path":  "/incident-creation"
+                                "path": "/incident-creation"
                             }
                         }
                     },
-                    "actions":  {
-                        "Add_comment_to_incident_(V3)":  {
-                            "runAfter":  {
-                                "Compose":  [
+                    "actions": {
+                        "Add_comment_to_incident_(V3)": {
+                            "runAfter": {
+                                "Compose": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  {
-                                    "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                    "message":  "\u003cp\u003eTeams bericht verstuurd om @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')} naar\u003cbr\u003e\n@{body('Get_user')?['mail']}.\u0026nbsp;\u003c/p\u003e"
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "incidentArmId": "@triggerBody()?['object']?['id']",
+                                    "message": "\u003cp\u003eTeams bericht verstuurd om @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')} naar\u003cbr\u003e\n@{body('Get_user')?['mail']}.\u0026nbsp;\u003c/p\u003e"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
-                                "method":  "post",
-                                "path":  "/Incidents/Comment"
+                                "method": "post",
+                                "path": "/Incidents/Comment"
                             }
                         },
-                        "Compose":  {
-                            "runAfter":  {
-                                "Entities_-_Get_IPs":  [
+                        "Compose": {
+                            "runAfter": {
+                                "Entities_-_Get_IPs": [
                                     "Succeeded"
                                 ],
-                                "Get_user":  [
+                                "Get_user": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "Compose",
-                            "inputs":  {
-                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
-                                "actions":  [
+                            "type": "Compose",
+                            "inputs": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "actions": [
                                     {
-                                        "data":  {
-                                            "x":  "confirm"
+                                        "data": {
+                                            "x": "confirm"
                                         },
-                                        "title":  "Submit response!",
-                                        "type":  "Action.Submit"
+                                        "title": "Submit response!",
+                                        "type": "Action.Submit"
                                     }
                                 ],
-                                "body":  [
+                                "body": [
                                     {
-                                        "size":  "Large",
-                                        "text":  "Multiple failed log-ins",
-                                        "type":  "TextBlock",
-                                        "wrap":  true
+                                        "size": "Large",
+                                        "text": "Multiple failed log-ins",
+                                        "type": "TextBlock",
+                                        "wrap": true
                                     },
                                     {
-                                        "facts":  [
+                                        "facts": [
                                             {
-                                                "title":  "Tijd",
-                                                "value":  "@{convertTimeZone(triggerBody()?['object']?['properties']?['CreatedTimeUtc'], 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}"
+                                                "title": "Tijd",
+                                                "value": "@{convertTimeZone(triggerBody()?['object']?['properties']?['CreatedTimeUtc'], 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}"
                                             },
                                             {
-                                                "title":  "IP",
-                                                "value":  "@{body('Entities_-_Get_IPs')?['IPs']?[0]?['address']}"
+                                                "title": "IP",
+                                                "value": "@{body('Entities_-_Get_IPs')?['IPs']?[0]?['address']}"
                                             },
                                             {
-                                                "title":  "Amount",
-                                                "value":  "TO-DO"
+                                                "title": "Amount",
+                                                "value": "TO-DO"
                                             },
                                             {
-                                                "title":  "Gebruiker",
-                                                "value":  "@{body('Get_user')?['displayName']}"
+                                                "title": "Gebruiker",
+                                                "value": "@{body('Get_user')?['displayName']}"
                                             }
                                         ],
-                                        "type":  "FactSet"
+                                        "type": "FactSet"
                                     },
                                     {
-                                        "size":  "Large",
-                                        "spacing":  "Large",
-                                        "text":  "Respond:",
-                                        "type":  "TextBlock",
-                                        "weight":  "Bolder"
+                                        "size": "Large",
+                                        "spacing": "Large",
+                                        "text": "Respond:",
+                                        "type": "TextBlock",
+                                        "weight": "Bolder"
                                     },
                                     {
-                                        "size":  "Small",
-                                        "style":  "Person",
-                                        "type":  "Image",
-                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                        "size": "Small",
+                                        "style": "Person",
+                                        "type": "Image",
+                                        "url": "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
                                     },
                                     {
-                                        "choices":  [
+                                        "choices": [
                                             {
-                                                "title":  "Ja",
-                                                "value":  "ja"
+                                                "title": "Ja",
+                                                "value": "ja"
                                             },
                                             {
-                                                "title":  "Nee",
-                                                "value":  "nee"
+                                                "title": "Nee",
+                                                "value": "nee"
                                             }
                                         ],
-                                        "errorMessage":  "Geef een keuze in!",
-                                        "id":  "verificatie",
-                                        "isRequired":  true,
-                                        "label":  "Was u dit?",
-                                        "style":  "expanded",
-                                        "type":  "Input.ChoiceSet"
+                                        "errorMessage": "Geef een keuze in!",
+                                        "id": "verificatie",
+                                        "isRequired": true,
+                                        "label": "Was u dit?",
+                                        "style": "expanded",
+                                        "type": "Input.ChoiceSet"
                                     },
                                     {
-                                        "id":  "reden",
-                                        "isMultiline":  true,
-                                        "label":  "Indien 'ja', geef een reden op:",
-                                        "maxLength":  0,
-                                        "placeholder":  "Geen een korte reden in...",
-                                        "type":  "Input.Text"
+                                        "id": "reden",
+                                        "isMultiline": true,
+                                        "label": "Indien 'ja', geef een reden op:",
+                                        "maxLength": 0,
+                                        "placeholder": "Geen een korte reden in...",
+                                        "type": "Input.Text"
                                     }
                                 ],
-                                "type":  "AdaptiveCard",
-                                "version":  "1.3"
+                                "type": "AdaptiveCard",
+                                "version": "1.3"
                             }
                         },
-                        "Condition":  {
-                            "actions":  {
-                                "Add_comment_to_incident_(V3)_2":  {
-                                    "runAfter":  {
-                                        "Update_incident":  [
+                        "Condition": {
+                            "actions": {
+                                "Add_comment_to_incident_(V3)_2": {
+                                    "runAfter": {
+                                        "Update_incident": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "ApiConnection",
-                                    "inputs":  {
-                                        "body":  {
-                                            "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                            "message":  "\u003cp\u003eTeams bericht ontvangen om @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')} van @{body('Get_user')?['mail']}.\u003cbr\u003e\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\u003cbr\u003e\nGebruiker geeft aan verantwoordelijk te zijn voor deze logins.\u003cbr\u003e\nReden:\u003cbr\u003e\n@{body('Post_Adaptive_Card_and_wait_for_a_response')?['data']?['reden']}\u003c/p\u003e"
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "incidentArmId": "@triggerBody()?['object']?['id']",
+                                            "message": "\u003cp\u003eTeams bericht ontvangen om @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')} van @{body('Get_user')?['mail']}.\u003cbr\u003e\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\u003cbr\u003e\nGebruiker geeft aan verantwoordelijk te zijn voor deze logins.\u003cbr\u003e\nReden:\u003cbr\u003e\n@{body('Post_Adaptive_Card_and_wait_for_a_response')?['data']?['reden']}\u003c/p\u003e"
                                         },
-                                        "host":  {
-                                            "connection":  {
-                                                "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                             }
                                         },
-                                        "method":  "post",
-                                        "path":  "/Incidents/Comment"
+                                        "method": "post",
+                                        "path": "/Incidents/Comment"
                                     }
                                 },
-                                "Update_incident":  {
-                                    "runAfter":  {
-                                    },
-                                    "type":  "ApiConnection",
-                                    "inputs":  {
-                                        "body":  {
-                                            "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                            "severity":  "Informational"
+                                "Update_incident": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "incidentArmId": "@triggerBody()?['object']?['id']",
+                                            "severity": "Informational"
                                         },
-                                        "host":  {
-                                            "connection":  {
-                                                "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                             }
                                         },
-                                        "method":  "put",
-                                        "path":  "/Incidents"
+                                        "method": "put",
+                                        "path": "/Incidents"
                                     }
                                 }
                             },
-                            "runAfter":  {
-                                "Add_comment_to_incident_(V3)":  [
+                            "runAfter": {
+                                "Add_comment_to_incident_(V3)": [
                                     "Succeeded"
                                 ],
-                                "Post_adaptive_card_and_wait_for_a_response":  [
+                                "Post_adaptive_card_and_wait_for_a_response": [
                                     "Succeeded"
                                 ]
                             },
-                            "else":  {
-                                "actions":  {
-                                    "AAD_Risks_Module":  {
-                                        "runAfter":  {
-                                            "Base_Module":  [
+                            "else": {
+                                "actions": {
+                                    "AAD_Risks_Module": {
+                                        "runAfter": {
+                                            "Base_Module": [
                                                 "Succeeded"
                                             ]
                                         },
-                                        "type":  "ApiConnection",
-                                        "inputs":  {
-                                            "body":  {
-                                                "BaseModuleBody":  "@{body('Base_Module')}",
-                                                "LookbackInDays":  7
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": {
+                                                "BaseModuleBody": "@{body('Base_Module')}",
+                                                "LookbackInDays": 7
                                             },
-                                            "host":  {
-                                                "connection":  {
-                                                    "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                                 }
                                             },
-                                            "method":  "post",
-                                            "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/aadrisks",
-                                            "queries":  {
-                                                "api-version":  "2016-10-01",
-                                                "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                                "sp":  "/triggers/manual/run",
-                                                "sv":  "1.0"
+                                            "method": "post",
+                                            "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/aadrisks",
+                                            "queries": {
+                                                "api-version": "2016-10-01",
+                                                "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                "sp": "/triggers/manual/run",
+                                                "sv": "1.0"
                                             }
                                         }
                                     },
-                                    "Add_comment_to_incident_(V3)_3":  {
-                                        "runAfter":  {
-                                            "Update_incident_2":  [
+                                    "Add_comment_to_incident_(V3)_3": {
+                                        "runAfter": {
+                                            "Update_incident_2": [
                                                 "Succeeded"
                                             ]
                                         },
-                                        "type":  "ApiConnection",
-                                        "inputs":  {
-                                            "body":  {
-                                                "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                                "message":  "\u003cp\u003eGebruiker gaf aan niet verantwoordelijk te zijn voor de mislukte log-ins. De automatische triage van STAT berekende een risico score van:\u003cbr\u003e\n\u003cbr\u003e\n (~3 is normaal). Check de comments voor verdere informatie.\u003c/p\u003e"
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": {
+                                                "incidentArmId": "@triggerBody()?['object']?['id']",
+                                                "message": "\u003cp\u003eGebruiker gaf aan niet verantwoordelijk te zijn voor de mislukte log-ins. De automatische triage van STAT berekende een risico score van:\u003cbr\u003e\n\u003cbr\u003e\n (~3 is normaal). Check de comments voor verdere informatie.\u003c/p\u003e"
                                             },
-                                            "host":  {
-                                                "connection":  {
-                                                    "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                                 }
                                             },
-                                            "method":  "post",
-                                            "path":  "/Incidents/Comment"
+                                            "method": "post",
+                                            "path": "/Incidents/Comment"
                                         }
                                     },
-                                    "Base_Module":  {
-                                        "runAfter":  {
-                                        },
-                                        "type":  "ApiConnection",
-                                        "inputs":  {
-                                            "body":  {
-                                                "Entities":  "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                                "IncidentARMId":  "@triggerBody()?['object']?['id']",
-                                                "WorkspaceId":  "@triggerBody()?['workspaceId']"
+                                    "Base_Module": {
+                                        "runAfter": {},
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": {
+                                                "Entities": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                                "IncidentARMId": "@triggerBody()?['object']?['id']",
+                                                "WorkspaceId": "@triggerBody()?['workspaceId']"
                                             },
-                                            "host":  {
-                                                "connection":  {
-                                                    "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                                 }
                                             },
-                                            "method":  "post",
-                                            "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/base",
-                                            "queries":  {
-                                                "api-version":  "2016-10-01",
-                                                "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                                "sp":  "/triggers/manual/run",
-                                                "sv":  "1.0"
+                                            "method": "post",
+                                            "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/base",
+                                            "queries": {
+                                                "api-version": "2016-10-01",
+                                                "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                "sp": "/triggers/manual/run",
+                                                "sv": "1.0"
                                             }
                                         }
                                     },
-                                    "For_each":  {
-                                        "foreach":  "@body('Run_query_and_list_results')?['value']",
-                                        "actions":  {
-                                            "Add_task_to_incident":  {
-                                                "runAfter":  {
-                                                },
-                                                "type":  "ApiConnection",
-                                                "inputs":  {
-                                                    "body":  {
-                                                        "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                                        "taskDescription":  "\u003cp\u003e@{items('For_each')?['Description']}\u003c/p\u003e",
-                                                        "taskTitle":  "@{items('For_each')?['Title']}"
+                                    "For_each": {
+                                        "foreach": "@body('Run_query_and_list_results')?['value']",
+                                        "actions": {
+                                            "Add_task_to_incident": {
+                                                "runAfter": {},
+                                                "type": "ApiConnection",
+                                                "inputs": {
+                                                    "body": {
+                                                        "incidentArmId": "@triggerBody()?['object']?['id']",
+                                                        "taskDescription": "\u003cp\u003e@{items('For_each')?['Description']}\u003c/p\u003e",
+                                                        "taskTitle": "@{items('For_each')?['Title']}"
                                                     },
-                                                    "host":  {
-                                                        "connection":  {
-                                                            "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                                    "host": {
+                                                        "connection": {
+                                                            "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                                         }
                                                     },
-                                                    "method":  "post",
-                                                    "path":  "/Incidents/CreateTask"
+                                                    "method": "post",
+                                                    "path": "/Incidents/CreateTask"
                                                 }
                                             }
                                         },
-                                        "runAfter":  {
-                                            "Run_query_and_list_results":  [
+                                        "runAfter": {
+                                            "Run_query_and_list_results": [
                                                 "Succeeded"
                                             ]
                                         },
-                                        "type":  "Foreach"
+                                        "type": "Foreach"
                                     },
-                                    "Out_of_Office_Module":  {
-                                        "runAfter":  {
-                                            "Base_Module":  [
+                                    "Out_of_Office_Module": {
+                                        "runAfter": {
+                                            "Base_Module": [
                                                 "Succeeded"
                                             ]
                                         },
-                                        "type":  "ApiConnection",
-                                        "inputs":  {
-                                            "body":  {
-                                                "BaseModuleBody":  "@{body('Base_Module')}"
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": {
+                                                "BaseModuleBody": "@{body('Base_Module')}"
                                             },
-                                            "host":  {
-                                                "connection":  {
-                                                    "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                                 }
                                             },
-                                            "method":  "post",
-                                            "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/oofmodule",
-                                            "queries":  {
-                                                "api-version":  "2016-10-01",
-                                                "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                                "sp":  "/triggers/manual/run",
-                                                "sv":  "1.0"
+                                            "method": "post",
+                                            "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/oofmodule",
+                                            "queries": {
+                                                "api-version": "2016-10-01",
+                                                "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                "sp": "/triggers/manual/run",
+                                                "sv": "1.0"
                                             }
                                         }
                                     },
-                                    "Risk_Scoring_Module":  {
-                                        "runAfter":  {
-                                            "AAD_Risks_Module":  [
+                                    "Risk_Scoring_Module": {
+                                        "runAfter": {
+                                            "AAD_Risks_Module": [
                                                 "Succeeded"
                                             ],
-                                            "Out_of_Office_Module":  [
+                                            "Out_of_Office_Module": [
                                                 "Succeeded"
                                             ],
-                                            "Threat_Intel_Module":  [
+                                            "Threat_Intel_Module": [
                                                 "Succeeded"
                                             ]
                                         },
-                                        "type":  "ApiConnection",
-                                        "inputs":  {
-                                            "body":  {
-                                                "BaseModuleBody":  "@{body('Base_Module')}",
-                                                "ScoringData":  [
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": {
+                                                "BaseModuleBody": "@{body('Base_Module')}",
+                                                "ScoringData": [
                                                     {
-                                                        "ModuleBody":  "@body('Threat_Intel_Module')",
-                                                        "ScoreLabel":  "Threat Intelligence",
-                                                        "ScoreMultiplier":  1,
-                                                        "ScorePerItem":  true
+                                                        "ModuleBody": "@body('Threat_Intel_Module')",
+                                                        "ScoreLabel": "Threat Intelligence",
+                                                        "ScoreMultiplier": 1,
+                                                        "ScorePerItem": true
                                                     },
                                                     {
-                                                        "ModuleBody":  "@body('AAD_Risks_Module')",
-                                                        "ScoreLabel":  "AAD RisicoScore",
-                                                        "ScoreMultiplier":  1,
-                                                        "ScorePerItem":  true
+                                                        "ModuleBody": "@body('AAD_Risks_Module')",
+                                                        "ScoreLabel": "AAD RisicoScore",
+                                                        "ScoreMultiplier": 1,
+                                                        "ScorePerItem": true
                                                     }
                                                 ]
                                             },
-                                            "host":  {
-                                                "connection":  {
-                                                    "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                                 }
                                             },
-                                            "method":  "post",
-                                            "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/scoring",
-                                            "queries":  {
-                                                "api-version":  "2016-10-01",
-                                                "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                                "sp":  "/triggers/manual/run",
-                                                "sv":  "1.0"
+                                            "method": "post",
+                                            "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/scoring",
+                                            "queries": {
+                                                "api-version": "2016-10-01",
+                                                "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                "sp": "/triggers/manual/run",
+                                                "sv": "1.0"
                                             }
                                         }
                                     },
-                                    "Run_query_and_list_results":  {
-                                        "runAfter":  {
-                                            "Add_comment_to_incident_(V3)_3":  [
+                                    "Run_query_and_list_results": {
+                                        "runAfter": {
+                                            "Add_comment_to_incident_(V3)_3": [
                                                 "Succeeded"
                                             ]
                                         },
-                                        "type":  "ApiConnection",
-                                        "inputs":  {
-                                            "body":  "_GetWatchlist('SocRA')\n| where SearchKey == \"MultipleLoginsFailed\"\n| project-away _DTItemId, LastUpdatedTimeUTC, SearchKey, Alert, Date\n| extend PackedIgnoreNullEmpty=pack_all(true)\n| mv-expand PackedIgnoreNullEmpty\n| extend Task = split(PackedIgnoreNullEmpty, '\"', 3)\n| extend Title = split(Task.[0], '^', 0)\n| extend Description = split(Task.[0], '^', 1)\n| project Title = Title.[0], Description = Description.[0]",
-                                            "host":  {
-                                                "connection":  {
-                                                    "name":  "@parameters('$connections')['azuremonitorlogs']['connectionId']"
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": "_GetWatchlist('SocRA')\n| where SearchKey == \"MultipleLoginsFailed\"\n| project-away _DTItemId, LastUpdatedTimeUTC, SearchKey, Alert, Date\n| extend PackedIgnoreNullEmpty=pack_all(true)\n| mv-expand PackedIgnoreNullEmpty\n| extend Task = split(PackedIgnoreNullEmpty, '\"', 3)\n| extend Title = split(Task.[0], '^', 0)\n| extend Description = split(Task.[0], '^', 1)\n| project Title = Title.[0], Description = Description.[0]",
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['azuremonitorlogs']['connectionId']"
                                                 }
                                             },
-                                            "method":  "post",
-                                            "path":  "/queryData",
-                                            "queries":  {
-                                                "resourcegroups":  "SentinelTest",
-                                                "resourcename":  "SentinelTestspace",
-                                                "resourcetype":  "Log Analytics Workspace",
-                                                "subscriptions":  "11835bdd-846f-428a-8101-0cd684ec0804",
-                                                "timerange":  "@{utcNow()}"
+                                            "method": "post",
+                                            "path": "/queryData",
+                                            "queries": {
+                                                "resourcegroups": "SentinelTest",
+                                                "resourcename": "SentinelTestspace",
+                                                "resourcetype": "Log Analytics Workspace",
+                                                "subscriptions": "11835bdd-846f-428a-8101-0cd684ec0804",
+                                                "timerange": "@{utcNow()}"
                                             }
                                         }
                                     },
-                                    "Threat_Intel_Module":  {
-                                        "runAfter":  {
-                                            "Base_Module":  [
+                                    "Threat_Intel_Module": {
+                                        "runAfter": {
+                                            "Base_Module": [
                                                 "Succeeded"
                                             ]
                                         },
-                                        "type":  "ApiConnection",
-                                        "inputs":  {
-                                            "body":  {
-                                                "BaseModuleBody":  "@{body('Base_Module')}",
-                                                "CheckDomains":  false,
-                                                "CheckFileHashes":  false,
-                                                "CheckURLs":  false
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": {
+                                                "BaseModuleBody": "@{body('Base_Module')}",
+                                                "CheckDomains": false,
+                                                "CheckFileHashes": false,
+                                                "CheckURLs": false
                                             },
-                                            "host":  {
-                                                "connection":  {
-                                                    "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                                 }
                                             },
-                                            "method":  "post",
-                                            "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/threatintel",
-                                            "queries":  {
-                                                "api-version":  "2016-10-01",
-                                                "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                                "sp":  "/triggers/manual/run",
-                                                "sv":  "1.0"
+                                            "method": "post",
+                                            "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/threatintel",
+                                            "queries": {
+                                                "api-version": "2016-10-01",
+                                                "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                "sp": "/triggers/manual/run",
+                                                "sv": "1.0"
                                             }
                                         }
                                     },
-                                    "Update_incident_2":  {
-                                        "runAfter":  {
-                                            "Risk_Scoring_Module":  [
+                                    "Update_incident_2": {
+                                        "runAfter": {
+                                            "Risk_Scoring_Module": [
                                                 "Succeeded"
                                             ]
                                         },
-                                        "type":  "ApiConnection",
-                                        "inputs":  {
-                                            "body":  {
-                                                "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                                "tagsToAdd":  {
-                                                    "TagsToAdd":  [
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "body": {
+                                                "incidentArmId": "@triggerBody()?['object']?['id']",
+                                                "tagsToAdd": {
+                                                    "TagsToAdd": [
                                                         {
-                                                            "Tag":  "RiskScore: "
+                                                            "Tag": "RiskScore: "
                                                         }
                                                     ]
                                                 }
                                             },
-                                            "host":  {
-                                                "connection":  {
-                                                    "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                                 }
                                             },
-                                            "method":  "put",
-                                            "path":  "/Incidents"
+                                            "method": "put",
+                                            "path": "/Incidents"
                                         }
                                     }
                                 }
                             },
-                            "expression":  {
-                                "and":  [
+                            "expression": {
+                                "and": [
                                     {
-                                        "equals":  [
+                                        "equals": [
                                             "@body('Post_Adaptive_Card_and_wait_for_a_response')?['data']?['verificatie']",
                                             "ja"
                                         ]
                                     }
                                 ]
                             },
-                            "type":  "If"
+                            "type": "If"
                         },
-                        "Entities_-_Get_Accounts":  {
-                            "runAfter":  {
-                            },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                        "Entities_-_Get_Accounts": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
-                                "method":  "post",
-                                "path":  "/entities/account"
+                                "method": "post",
+                                "path": "/entities/account"
                             }
                         },
-                        "Entities_-_Get_IPs":  {
-                            "runAfter":  {
-                            },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                        "Entities_-_Get_IPs": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
-                                "method":  "post",
-                                "path":  "/entities/ip"
+                                "method": "post",
+                                "path": "/entities/ip"
                             }
                         },
-                        "Get_user":  {
-                            "runAfter":  {
-                                "Entities_-_Get_Accounts":  [
+                        "Get_user": {
+                            "runAfter": {
+                                "Entities_-_Get_Accounts": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['azuread']['connectionId']"
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuread']['connectionId']"
                                     }
                                 },
-                                "method":  "get",
-                                "path":  "/v1.0/users/@{encodeURIComponent(body('Entities_-_Get_Accounts')?['Accounts']?[0]?['aadUserID'])}"
+                                "method": "get",
+                                "path": "/v1.0/users/@{encodeURIComponent(body('Entities_-_Get_Accounts')?['Accounts']?[0]?['aadUserID'])}"
                             }
                         },
-                        "Post_adaptive_card_and_wait_for_a_response":  {
-                            "runAfter":  {
-                                "Compose":  [
+                        "Post_adaptive_card_and_wait_for_a_response": {
+                            "runAfter": {
+                                "Compose": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "ApiConnectionWebhook",
-                            "inputs":  {
-                                "body":  {
-                                    "body":  {
-                                        "messageBody":  "@{outputs('Compose')}",
-                                        "recipient":  {
-                                            "to":  "@body('Get_user')?['mail']"
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "body": {
+                                    "body": {
+                                        "messageBody": "@{outputs('Compose')}",
+                                        "recipient": {
+                                            "to": "@body('Get_user')?['mail']"
                                         },
-                                        "updateMessage":  "Thanks for your response!"
+                                        "updateMessage": "Thanks for your response!"
                                     },
-                                    "notificationUrl":  "@{listCallbackUrl()}"
+                                    "notificationUrl": "@{listCallbackUrl()}"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['teams']['connectionId']"
                                     }
                                 },
-                                "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                                "path": "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
                             }
                         },
-                        "Update_incident_3":  {
-                            "runAfter":  {
-                                "Condition":  [
+                        "Update_incident_3": {
+                            "runAfter": {
+                                "Condition": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  {
-                                    "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                    "tagsToAdd":  {
-                                        "TagsToAdd":  [
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "incidentArmId": "@triggerBody()?['object']?['id']",
+                                    "tagsToAdd": {
+                                        "TagsToAdd": [
                                             {
-                                                "Tag":  "automated"
+                                                "Tag": "automated"
                                             }
                                         ]
                                     }
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
-                                "method":  "put",
-                                "path":  "/Incidents"
+                                "method": "put",
+                                "path": "/Incidents"
                             }
                         }
                     },
-                    "outputs":  {
-                    }
+                    "outputs": {}
                 },
-                "parameters":  {
-                    "$connections":  {
-                        "value":  {
-                            "SentinelTriageAssistant":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
-                                "connectionName":  "[variables('SentineltriageassistantConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/customApis/Sentineltriageassistant')]"
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "SentinelTriageAssistant": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
+                                "connectionName": "[variables('SentineltriageassistantConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/customApis/', variables('SentineltriageassistantConnectionName'))]"
                             },
-                            "azuread":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
-                                "connectionName":  "[variables('AzureadConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
+                            "azuread": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
+                                "connectionName": "[variables('AzureadConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
                             },
-                            "azuremonitorlogs":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('AzuremonitorlogsConnectionName'))]",
-                                "connectionName":  "[variables('AzuremonitorlogsConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuremonitorlogs')]"
+                            "azuremonitorlogs": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzuremonitorlogsConnectionName'))]",
+                                "connectionName": "[variables('AzuremonitorlogsConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuremonitorlogs')]"
                             },
-                            "azuresentinel":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
-                                "connectionName":  "[variables('MicrosoftSentinelConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
-                                "connectionProperties":  {
-                                    "authentication":  {
-                                        "type":  "ManagedServiceIdentity"
+                            "azuresentinel": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                                "connectionName": "[variables('MicrosoftSentinelConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
                                     }
                                 }
                             },
-                            "teams":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
-                                "connectionName":  "[variables('TeamsConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+                            "teams": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
+                                "connectionName": "[variables('TeamsConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
                             }
                         }
                     }
                 }
             },
-            "name":  "[parameters('PlaybookName')]",
-            "type":  "Microsoft.Logic/workflows",
-            "location":  "[resourceGroup().location]",
-            "tags":  {
-                "use case":  "2",
-                "hidden-SentinelTemplateName":  "MultipleLoginsFailed",
-                "hidden-SentinelTemplateVersion":  "1.0"
+            "name": "[parameters('PlaybookName')]",
+            "type": "Microsoft.Logic/workflows",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "use case": "2",
+                "hidden-SentinelTemplateName": "MultipleLoginsFailed",
+                "hidden-SentinelTemplateVersion": "1.0"
             },
-            "identity":  {
-                "type":  "SystemAssigned"
+            "identity": {
+                "type": "SystemAssigned"
             },
-            "apiVersion":  "2017-07-01",
-            "dependsOn":  [
-                "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
+            "apiVersion": "2017-07-01",
+            "dependsOn": [
+                // "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
                 "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
                 "[resourceId('Microsoft.Web/connections', variables('AzuremonitorlogsConnectionName'))]",
                 "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
                 "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]"
             ]
         },
+        // {
+        //     "type":  "Microsoft.Web/connections",
+        //     "apiVersion":  "2016-06-01",
+        //     "name":  "[variables('SentineltriageassistantConnectionName')]",
+        //     "location":  "[resourceGroup().location]",
+        //     "kind":  "V1",
+        //     "properties":  {
+        //         "displayName":  "[variables('SentineltriageassistantConnectionName')]",
+        //         "customParameterValues":  {
+        //         },
+        //         "api":  {
+        //             "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/customApis/Sentineltriageassistant')]"
+        //         }
+        //     }
+        // },
         {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('SentineltriageassistantConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('SentineltriageassistantConnectionName')]",
-                "customParameterValues":  {
-                },
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/customApis/Sentineltriageassistant')]"
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('AzureadConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('AzureadConnectionName')]",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
                 }
             }
         },
         {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('AzureadConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('AzureadConnectionName')]",
-                "customParameterValues":  {
-                },
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('AzuremonitorlogsConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('AzuremonitorlogsConnectionName')]",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuremonitorlogs')]"
                 }
             }
         },
         {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('AzuremonitorlogsConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('AzuremonitorlogsConnectionName')]",
-                "customParameterValues":  {
-                },
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuremonitorlogs')]"
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('MicrosoftSentinelConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('MicrosoftSentinelConnectionName')]",
+                "customParameterValues": {},
+                "parameterValueType": "Alternative",
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
                 }
             }
         },
         {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('MicrosoftSentinelConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('MicrosoftSentinelConnectionName')]",
-                "customParameterValues":  {
-                },
-                "parameterValueType":  "Alternative",
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
-                }
-            }
-        },
-        {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('TeamsConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('TeamsConnectionName')]",
-                "customParameterValues":  {
-                },
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('TeamsConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('TeamsConnectionName')]",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
                 }
             }
         }
