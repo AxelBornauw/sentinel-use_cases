@@ -760,7 +760,7 @@
                             "AbuseIPDBAPI": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AbuseipdbapiConnectionName'))]",
                                 "connectionName": "[variables('AbuseipdbapiConnectionName')]",
-                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/customApis/', variables('AbuseipdbapiConnectionName'))]"
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/customApis/AbuseIPDBAPI')]"
                             },
                             "SentinelTriageAssistant": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
