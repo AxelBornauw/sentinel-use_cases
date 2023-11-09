@@ -264,7 +264,7 @@
                                         "inputs": {
                                             "body": {
                                                 "incidentArmId": "@triggerBody()?['object']?['id']",
-                                                "message": "\u003cp\u003eGebruiker gaf aan niet verantwoordelijk te zijn voor de mislukte log-ins. De automatische triage van STAT berekende een risico score van:\u003cbr\u003e\n\u003cbr\u003e\n (~3 is normaal). Check de comments voor verdere informatie.\u003c/p\u003e"
+                                                "message": "\u003cp\u003eGebruiker gaf aan niet verantwoordelijk te zijn voor de mislukte log-ins. De automatische triage van STAT berekende een risico score van: @{body('Risk_Scoring_Module')?['TotalScore']}\u003cbr\u003e\n\u003cbr\u003e\n (~3 is normaal). Check de comments voor verdere informatie.\u003c/p\u003e"
                                             },
                                             "host": {
                                                 "connection": {
