@@ -114,7 +114,7 @@
                                     {
                                         "facts": [
                                             {
-                                                "title": "Tijd",
+                                                "title": "Time (BE)",
                                                 "value": "@{convertTimeZone(triggerBody()?['object']?['properties']?['CreatedTimeUtc'], 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}"
                                             },
                                             {
