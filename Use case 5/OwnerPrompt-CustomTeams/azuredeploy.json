@@ -1,0 +1,1286 @@
+{
+    "$schema":  "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion":  "1.0.0.0",
+    "parameters":  {
+        "PlaybookName":  {
+            "defaultValue":  "OwnerPrompt-CustomTeams",
+            "type":  "string"
+        },
+        "Storage account blob container name":  {
+            "type":  "String",
+            "metadata":  {
+                "description":  "Enter value for Storage account blob container name"
+            }
+        }
+    },
+    "variables":  {
+        "SentineltriageassistantConnectionName":  "[concat('Sentineltriageassistant-', parameters('PlaybookName'))]",
+        "AzureblobConnectionName":  "[concat('Azureblob-', parameters('PlaybookName'))]",
+        "MicrosoftSentinelConnectionName":  "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
+        "TeamsConnectionName":  "[concat('Teams-', parameters('PlaybookName'))]"
+    },
+    "resources":  [
+        {
+            "properties":  {
+                "provisioningState":  "Succeeded",
+                "state":  "Enabled",
+                "definition":  {
+                    "$schema":  "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion":  "1.0.0.0",
+                    "parameters":  {
+                        "$connections":  {
+                            "defaultValue":  {
+                            },
+                            "type":  "Object"
+                        },
+                        "Storage account blob container name":  {
+                            "defaultValue":  "[parameters('Storage account blob container name')]",
+                            "type":  "String"
+                        }
+                    },
+                    "triggers":  {
+                        "Microsoft_Sentinel_incident":  {
+                            "type":  "ApiConnectionWebhook",
+                            "inputs":  {
+                                "body":  {
+                                    "callback_url":  "@{listCallbackUrl()}"
+                                },
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "path":  "/incident-creation"
+                            }
+                        }
+                    },
+                    "actions":  {
+                        "Append_to_string_variable_4":  {
+                            "runAfter":  {
+                                "Post_message_in_a_chat_or_channel":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "AppendToStringVariable",
+                            "inputs":  {
+                                "name":  "Antwoord",
+                                "value":  "@concat('//BEGIN', substring(variables('AntwoordKomma'),0,sub(length(variables('AntwoordKomma')),1)), '//EINDE')"
+                            }
+                        },
+                        "Compose":  {
+                            "runAfter":  {
+                                "Get_blob_content_using_path_(V2)":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "Compose",
+                            "inputs":  {
+                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "actions":  [
+                                    {
+                                        "data":  {
+                                            "x":  "confirm"
+                                        },
+                                        "title":  "Submit response!",
+                                        "type":  "Action.Submit"
+                                    }
+                                ],
+                                "body":  [
+                                    {
+                                        "size":  "Small",
+                                        "style":  "Person",
+                                        "type":  "Image",
+                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                    },
+                                    {
+                                        "size":  "Large",
+                                        "text":  "Custom Teams bericht versturen:",
+                                        "type":  "TextBlock",
+                                        "wrap":  true
+                                    },
+                                    {
+                                        "text":  "[[Bekijk hier het incident]](@{triggerBody()?['object']?['properties']?['incidentUrl']})",
+                                        "type":  "TextBlock",
+                                        "wrap":  true
+                                    },
+                                    {
+                                        "size":  "Medium",
+                                        "text":  "[Teams templates voor inspiratie](https://github.com/AxelBornauw/sentinel-use_cases/tree/main/templates#ms-teams-templates)",
+                                        "type":  "TextBlock",
+                                        "weight":  "Bolder",
+                                        "wrap":  true
+                                    },
+                                    {
+                                        "text":  "Geadresseerede(n): **@{body('Get_blob_content_using_path_(V2)')}**",
+                                        "type":  "TextBlock",
+                                        "wrap":  true
+                                    },
+                                    {
+                                        "errorMessage":  "Geef een titel in!",
+                                        "id":  "titel",
+                                        "isRequired":  true,
+                                        "label":  "Custom titel:",
+                                        "placeholder":  "Titel...",
+                                        "type":  "Input.Text"
+                                    },
+                                    {
+                                        "errorMessage":  "Geef een tekst in!",
+                                        "id":  "tekst",
+                                        "isMultiline":  true,
+                                        "isRequired":  true,
+                                        "label":  "Custom bericht:",
+                                        "placeholder":  "Custom tekst...",
+                                        "type":  "Input.Text"
+                                    },
+                                    {
+                                        "choices":  [
+                                            {
+                                                "title":  "geen prompt",
+                                                "value":  "geen"
+                                            },
+                                            {
+                                                "title":  "ja/nee",
+                                                "value":  "janee"
+                                            },
+                                            {
+                                                "title":  "ja/nee + reden",
+                                                "value":  "janeereden"
+                                            },
+                                            {
+                                                "title":  "tekstveldje",
+                                                "value":  "tekstveld"
+                                            },
+                                            {
+                                                "title":  "custom:",
+                                                "value":  "customkeuze"
+                                            }
+                                        ],
+                                        "errorMessage":  "Kies een template/maak een eigen formaat",
+                                        "id":  "keuze",
+                                        "isRequired":  true,
+                                        "label":  "Mogelijke keuzes:",
+                                        "style":  "expanded",
+                                        "type":  "Input.ChoiceSet",
+                                        "value":  "geen"
+                                    },
+                                    {
+                                        "id":  "customkeuze",
+                                        "placeholder":  "Geef keuzes in volgend formaat op: keuze1;keuze2;...",
+                                        "type":  "Input.Text"
+                                    }
+                                ],
+                                "type":  "AdaptiveCard",
+                                "version":  "1.3"
+                            }
+                        },
+                        "Compose_7":  {
+                            "runAfter":  {
+                                "Append_to_string_variable_4":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "Compose",
+                            "inputs":  {
+                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "actions":  [
+                                    {
+                                        "data":  {
+                                            "x":  "confirm"
+                                        },
+                                        "iconUrl":  "https://cdn.pixabay.com/photo/2015/12/08/17/38/magnifying-glass-1083373_1280.png",
+                                        "title":  "Onderzoek verder",
+                                        "type":  "Action.Submit"
+                                    },
+                                    {
+                                        "data":  {
+                                            "x":  "cancel"
+                                        },
+                                        "iconUrl":  "https://cdn.pixabay.com/photo/2013/07/12/12/40/abort-146096_1280.png",
+                                        "title":  "Beëindig sessie",
+                                        "type":  "Action.Submit"
+                                    }
+                                ],
+                                "body":  [
+                                    {
+                                        "size":  "Small",
+                                        "style":  "Person",
+                                        "type":  "Image",
+                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                    },
+                                    {
+                                        "size":  "Large",
+                                        "text":  "Antwoord(en) ontvangen.",
+                                        "type":  "TextBlock",
+                                        "wrap":  true
+                                    },
+                                    "@variables('Antwoord')"
+                                ],
+                                "type":  "AdaptiveCard",
+                                "version":  "1.3"
+                            }
+                        },
+                        "Compose_8":  {
+                            "runAfter":  {
+                                "Compose_7":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "Compose",
+                            "inputs":  "@replace(replace(replace(string(outputs('Compose_7')),'\"//BEGIN', ''), '//EINDE\"', ''), '\\\"', '\"')"
+                        },
+                        "Condition":  {
+                            "actions":  {
+                                "Base_Module":  {
+                                    "runAfter":  {
+                                    },
+                                    "type":  "ApiConnection",
+                                    "inputs":  {
+                                        "body":  {
+                                            "AddAccountComments":  false,
+                                            "AddIPComments":  false,
+                                            "EnrichIPsWithGeoData":  false,
+                                            "Entities":  "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                            "IncidentARMId":  "@triggerBody()?['object']?['id']",
+                                            "WorkspaceId":  "@triggerBody()?['workspaceId']"
+                                        },
+                                        "host":  {
+                                            "connection":  {
+                                                "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                            }
+                                        },
+                                        "method":  "post",
+                                        "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/base",
+                                        "queries":  {
+                                            "api-version":  "2016-10-01",
+                                            "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                            "sp":  "/triggers/manual/run",
+                                            "sv":  "1.0"
+                                        }
+                                    }
+                                },
+                                "Run_Playbook_Module":  {
+                                    "runAfter":  {
+                                        "Base_Module":  [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type":  "ApiConnection",
+                                    "inputs":  {
+                                        "body":  {
+                                            "AddIncidentComments":  false,
+                                            "BaseModuleBody":  "@{body('Base_Module')}",
+                                            "LogicAppResourceId":  "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/OwnerPrompt-InvestigateEntity",
+                                            "PlaybookName":  "Entities onderzoeken playbook",
+                                            "TenantId":  "90625911-bfac-4bb3-9734-db8cd7699a52"
+                                        },
+                                        "host":  {
+                                            "connection":  {
+                                                "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                            }
+                                        },
+                                        "method":  "post",
+                                        "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
+                                        "queries":  {
+                                            "api-version":  "2016-10-01",
+                                            "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                            "sp":  "/triggers/manual/run",
+                                            "sv":  "1.0"
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter":  {
+                                "Post_adaptive_card_and_wait_for_a_response_6":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression":  {
+                                "and":  [
+                                    {
+                                        "equals":  [
+                                            "@body('Post_adaptive_card_and_wait_for_a_response_6')?['data']?['x']",
+                                            "confirm"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type":  "If"
+                        },
+                        "Delete_blob_(V2)":  {
+                            "runAfter":  {
+                                "Switch":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "ApiConnection",
+                            "inputs":  {
+                                "headers":  {
+                                    "SkipDeleteIfFileNotFoundOnServer":  false
+                                },
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method":  "delete",
+                                "path":  "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files/@{encodeURIComponent(encodeURIComponent('/',parameters('Storage account blob container name'),'/',variables('Blob')))}"
+                            }
+                        },
+                        "Get_blob_content_using_path_(V2)":  {
+                            "runAfter":  {
+                                "Initialize_variable_-_Blob":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "ApiConnection",
+                            "inputs":  {
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['azureblob']['connectionId']"
+                                    }
+                                },
+                                "method":  "get",
+                                "path":  "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/GetFileContentByPath",
+                                "queries":  {
+                                    "inferContentType":  false,
+                                    "path":  "/@{parameters('Storage account blob container name')}/@{variables('Blob')}",
+                                    "queryParametersSingleEncoded":  true
+                                }
+                            }
+                        },
+                        "Initialize_variable":  {
+                            "runAfter":  {
+                                "Initialize_variable_-_AntwoordKomma":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Antwoord",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_AntwoordKomma":  {
+                            "runAfter":  {
+                                "Initialize_variable_-_Entities_array":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "AntwoordKomma",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_Blob":  {
+                            "runAfter":  {
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Blob",
+                                        "type":  "string",
+                                        "value":  "@{split(replace(triggerBody()?['object']?['properties']?['owner']?['email'], '.', ''), '@')[0]}@{triggerBody()?['object']?['properties']?['incidentNumber']}"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_CustomKeuze":  {
+                            "runAfter":  {
+                                "Initialize_variable_-_CustomkeuzeKomma":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Customkeuze",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_Custom_keuze_array":  {
+                            "runAfter":  {
+                                "Post_adaptive_card_and_wait_for_a_response":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "keuzearray",
+                                        "type":  "array",
+                                        "value":  "@split(string(body('Post_adaptive_card_and_wait_for_a_response')?['data']?['customkeuze']), ';')"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_CustomkeuzeKomma":  {
+                            "runAfter":  {
+                                "Post_adaptive_card_and_wait_for_a_response":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "CustomkeuzeKomma",
+                                        "type":  "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_Entities_array":  {
+                            "runAfter":  {
+                                "Post_adaptive_card_and_wait_for_a_response":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "entitiesarray",
+                                        "type":  "array",
+                                        "value":  "@split(string(body('Get_blob_content_using_path_(V2)')), ',')"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_Onderzoek_verder":  {
+                            "runAfter":  {
+                                "Initialize_variable_-_CustomKeuze":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "InitializeVariable",
+                            "inputs":  {
+                                "variables":  [
+                                    {
+                                        "name":  "Onderzoek",
+                                        "type":  "boolean",
+                                        "value":  false
+                                    }
+                                ]
+                            }
+                        },
+                        "Post_adaptive_card_and_wait_for_a_response":  {
+                            "runAfter":  {
+                                "Compose":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "ApiConnectionWebhook",
+                            "inputs":  {
+                                "body":  {
+                                    "body":  {
+                                        "messageBody":  "@{outputs('Compose')}",
+                                        "recipient":  {
+                                            "to":  "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                                        },
+                                        "updateMessage":  "Thanks for your response!"
+                                    },
+                                    "notificationUrl":  "@{listCallbackUrl()}"
+                                },
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                    }
+                                },
+                                "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                            }
+                        },
+                        "Post_adaptive_card_and_wait_for_a_response_6":  {
+                            "runAfter":  {
+                                "Compose_8":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "limit":  {
+                                "timeout":  "PT4H"
+                            },
+                            "type":  "ApiConnectionWebhook",
+                            "inputs":  {
+                                "body":  {
+                                    "body":  {
+                                        "messageBody":  "@{outputs('Compose_8')}",
+                                        "recipient":  {
+                                            "to":  "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                                        },
+                                        "updateMessage":  "Thanks for your response!"
+                                    },
+                                    "notificationUrl":  "@{listCallbackUrl()}"
+                                },
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                    }
+                                },
+                                "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                            }
+                        },
+                        "Post_message_in_a_chat_or_channel":  {
+                            "runAfter":  {
+                                "Delete_blob_(V2)":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type":  "ApiConnection",
+                            "inputs":  {
+                                "body":  {
+                                    "isAlert":  false,
+                                    "messageBody":  "\u003cp\u003e\u003cspan style=\"font-size: 16px\"\u003eBericht verstuurd\u003c/span\u003e\u003cbr\u003e\nTitel: \u003cstrong\u003e\u003c/strong\u003e\u003cstrong\u003e@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['titel']}\u003c/strong\u003e\u003cstrong\u003e\u003c/strong\u003e\u003cbr\u003e\nBericht:\u003cbr\u003e\n@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['tekst']}\u003c/p\u003e",
+                                    "recipient":  "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                                },
+                                "host":  {
+                                    "connection":  {
+                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                    }
+                                },
+                                "method":  "post",
+                                "path":  "/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
+                            }
+                        },
+                        "Switch":  {
+                            "runAfter":  {
+                                "Initialize_variable":  [
+                                    "Succeeded"
+                                ],
+                                "Initialize_variable_-_Custom_keuze_array":  [
+                                    "Succeeded"
+                                ],
+                                "Initialize_variable_-_Onderzoek_verder":  [
+                                    "Succeeded"
+                                ]
+                            },
+                            "cases":  {
+                                "Case_-_Custom_keuze":  {
+                                    "case":  "customkeuze",
+                                    "actions":  {
+                                        "Append_to_string_variable_2":  {
+                                            "runAfter":  {
+                                                "For_each_5":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "AppendToStringVariable",
+                                            "inputs":  {
+                                                "name":  "Customkeuze",
+                                                "value":  "@concat('//BEGIN', substring(variables('CustomkeuzeKomma'),0,sub(length(variables('CustomkeuzeKomma')),1)), '//EINDE')"
+                                            }
+                                        },
+                                        "Compose_-_keuze_met_BEGIN":  {
+                                            "runAfter":  {
+                                                "Append_to_string_variable_2":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Compose",
+                                            "inputs":  {
+                                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
+                                                "actions":  [
+                                                    {
+                                                        "data":  {
+                                                            "x":  "confirm"
+                                                        },
+                                                        "title":  "Submit response!",
+                                                        "type":  "Action.Submit"
+                                                    }
+                                                ],
+                                                "body":  [
+                                                    {
+                                                        "size":  "Small",
+                                                        "style":  "Person",
+                                                        "type":  "Image",
+                                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                                    },
+                                                    {
+                                                        "size":  "Large",
+                                                        "text":  "Bericht van SOC Team:",
+                                                        "type":  "TextBlock",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "size":  "Large",
+                                                        "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['titel']}",
+                                                        "type":  "TextBlock",
+                                                        "weight":  "Bolder",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "size":  "Medium",
+                                                        "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['tekst']}",
+                                                        "type":  "TextBlock",
+                                                        "weight":  "Lighter",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "choices":  [
+                                                            "@variables('Customkeuze')"
+                                                        ],
+                                                        "errorMessage":  "Geef een keuze in!",
+                                                        "id":  "keuze",
+                                                        "isRequired":  true,
+                                                        "label":  "Maak een keuze!",
+                                                        "style":  "expanded",
+                                                        "type":  "Input.ChoiceSet"
+                                                    }
+                                                ],
+                                                "type":  "AdaptiveCard",
+                                                "version":  "1.3"
+                                            }
+                                        },
+                                        "Compose_6":  {
+                                            "runAfter":  {
+                                                "Compose_-_keuze_met_BEGIN":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Compose",
+                                            "inputs":  "@replace(replace(replace(string(outputs('Compose_-_keuze_met_BEGIN')),'\"//BEGIN', ''), '//EINDE\"', ''), '\\\"', '\"')"
+                                        },
+                                        "For_each_5":  {
+                                            "foreach":  "@variables('keuzearray')",
+                                            "actions":  {
+                                                "Append_to_string_variable":  {
+                                                    "runAfter":  {
+                                                    },
+                                                    "type":  "AppendToStringVariable",
+                                                    "inputs":  {
+                                                        "name":  "CustomkeuzeKomma",
+                                                        "value":  "{\"title\": \"@{items('For_each_5')}\",\"value\" :\"@{items('For_each_5')}\"},"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter":  {
+                                            },
+                                            "type":  "Foreach"
+                                        },
+                                        "For_each_6":  {
+                                            "foreach":  "@variables('entitiesarray')",
+                                            "actions":  {
+                                                "Append_to_string_variable_7":  {
+                                                    "runAfter":  {
+                                                        "Post_adaptive_card_and_wait_for_a_response_5":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "AppendToStringVariable",
+                                                    "inputs":  {
+                                                        "name":  "AntwoordKomma",
+                                                        "value":  "{\"size\": \"Medium\",\"text\": \"@{items('For_each_6')}\",\"type\": \"TextBlock\",\"wrap\": true,\"weight\": \"Bolder\",\"separator\": true,\"horizontalAlignment\": \"Center\"},{\"size\": \"Medium\",\"text\": \"Antwoordde met keuze **@{body('Post_adaptive_card_and_wait_for_a_response_5')?['data']?['keuze']}** \",\"type\": \"TextBlock\",\"weight\": \"Default\",\"wrap\": true},"
+                                                    }
+                                                },
+                                                "Post_adaptive_card_and_wait_for_a_response_5":  {
+                                                    "runAfter":  {
+                                                    },
+                                                    "type":  "ApiConnectionWebhook",
+                                                    "inputs":  {
+                                                        "body":  {
+                                                            "body":  {
+                                                                "messageBody":  "@{outputs('Compose_6')}",
+                                                                "recipient":  {
+                                                                    "to":  "@{items('For_each_6')}"
+                                                                },
+                                                                "updateMessage":  "Thanks for your response!"
+                                                            },
+                                                            "notificationUrl":  "@{listCallbackUrl()}"
+                                                        },
+                                                        "host":  {
+                                                            "connection":  {
+                                                                "name":  "@parameters('$connections')['teams']['connectionId']"
+                                                            }
+                                                        },
+                                                        "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter":  {
+                                                "Compose_6":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Foreach"
+                                        }
+                                    }
+                                },
+                                "Case_-_Ja/nee_reden":  {
+                                    "case":  "janeereden",
+                                    "actions":  {
+                                        "Compose_4":  {
+                                            "runAfter":  {
+                                            },
+                                            "type":  "Compose",
+                                            "inputs":  {
+                                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
+                                                "actions":  [
+                                                    {
+                                                        "data":  {
+                                                            "x":  "confirm"
+                                                        },
+                                                        "title":  "Submit response!",
+                                                        "type":  "Action.Submit"
+                                                    }
+                                                ],
+                                                "body":  [
+                                                    {
+                                                        "size":  "Small",
+                                                        "style":  "Person",
+                                                        "type":  "Image",
+                                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                                    },
+                                                    {
+                                                        "size":  "Large",
+                                                        "text":  "Bericht van SOC Team:",
+                                                        "type":  "TextBlock",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "size":  "Large",
+                                                        "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['titel']}",
+                                                        "type":  "TextBlock",
+                                                        "weight":  "Bolder",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "size":  "Medium",
+                                                        "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['tekst']}",
+                                                        "type":  "TextBlock",
+                                                        "weight":  "Lighter",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "choices":  [
+                                                            {
+                                                                "title":  "Ja",
+                                                                "value":  "ja"
+                                                            },
+                                                            {
+                                                                "title":  "Nee",
+                                                                "value":  "nee"
+                                                            }
+                                                        ],
+                                                        "errorMessage":  "Dit is een verplicht veld!",
+                                                        "id":  "keuze",
+                                                        "isRequired":  true,
+                                                        "label":  "Maak een keuze:",
+                                                        "style":  "expanded",
+                                                        "type":  "Input.ChoiceSet"
+                                                    },
+                                                    {
+                                                        "id":  "tekst",
+                                                        "isMultiline":  true,
+                                                        "label":  "Indien je 'ja' antwoordde, reden:",
+                                                        "placeholder":  "Typ hier je reden in...",
+                                                        "type":  "Input.Text"
+                                                    }
+                                                ],
+                                                "type":  "AdaptiveCard",
+                                                "version":  "1.3"
+                                            }
+                                        },
+                                        "For_each_3":  {
+                                            "foreach":  "@variables('entitiesarray')",
+                                            "actions":  {
+                                                "Append_to_string_variable_3":  {
+                                                    "runAfter":  {
+                                                        "Post_adaptive_card_and_wait_for_a_response_3":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "AppendToStringVariable",
+                                                    "inputs":  {
+                                                        "name":  "AntwoordKomma",
+                                                        "value":  "{\"size\": \"Medium\",\"text\": \"@{items('For_each_3')}\",\"type\": \"TextBlock\",\"wrap\": true,\"weight\": \"Bolder\",\"separator\": true,\"horizontalAlignment\": \"Center\"},{\"size\": \"Medium\",\"text\":\"Antwoordde **@{body('Post_adaptive_card_and_wait_for_a_response_3')?['data']?['keuze']}**\",\"type\": \"TextBlock\",\"weight\": \"Default\",\"wrap\": true},{\"type\": \"TextBlock\",\"text\": \"Met reden (enkel bij 'Ja'):\",\"wrap\": true,\"size\": \"Default\"},{\"type\": \"TextBlock\",\"text\": \"*@{body('Post_adaptive_card_and_wait_for_a_response_3')?['data']?['tekst']}*\",\"wrap\": true,\"size\": \"Medium\"},"
+                                                    }
+                                                },
+                                                "Post_adaptive_card_and_wait_for_a_response_3":  {
+                                                    "runAfter":  {
+                                                    },
+                                                    "type":  "ApiConnectionWebhook",
+                                                    "inputs":  {
+                                                        "body":  {
+                                                            "body":  {
+                                                                "messageBody":  "@{outputs('Compose_4')}",
+                                                                "recipient":  {
+                                                                    "to":  "@{items('For_each_3')}"
+                                                                },
+                                                                "updateMessage":  "Thanks for your response!"
+                                                            },
+                                                            "notificationUrl":  "@{listCallbackUrl()}"
+                                                        },
+                                                        "host":  {
+                                                            "connection":  {
+                                                                "name":  "@parameters('$connections')['teams']['connectionId']"
+                                                            }
+                                                        },
+                                                        "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter":  {
+                                                "Compose_4":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Foreach"
+                                        }
+                                    }
+                                },
+                                "Case_-_Tekstveld":  {
+                                    "case":  "tekstveld",
+                                    "actions":  {
+                                        "Compose_3":  {
+                                            "runAfter":  {
+                                            },
+                                            "type":  "Compose",
+                                            "inputs":  {
+                                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
+                                                "actions":  [
+                                                    {
+                                                        "data":  {
+                                                            "x":  "confirm"
+                                                        },
+                                                        "title":  "Submit response!",
+                                                        "type":  "Action.Submit"
+                                                    }
+                                                ],
+                                                "body":  [
+                                                    {
+                                                        "size":  "Small",
+                                                        "style":  "Person",
+                                                        "type":  "Image",
+                                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                                    },
+                                                    {
+                                                        "size":  "Large",
+                                                        "text":  "Bericht van SOC Team:",
+                                                        "type":  "TextBlock",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "size":  "Large",
+                                                        "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['titel']}",
+                                                        "type":  "TextBlock",
+                                                        "weight":  "Bolder",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "size":  "Medium",
+                                                        "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['tekst']}",
+                                                        "type":  "TextBlock",
+                                                        "weight":  "Lighter",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "errorMessage":  "Dit is een verplicht veld!",
+                                                        "id":  "tekst",
+                                                        "isRequired":  true,
+                                                        "label":  "Verplicht veld",
+                                                        "placeholder":  "Typ hier je tekst...",
+                                                        "type":  "Input.Text"
+                                                    }
+                                                ],
+                                                "type":  "AdaptiveCard",
+                                                "version":  "1.3"
+                                            }
+                                        },
+                                        "For_each_4":  {
+                                            "foreach":  "@variables('entitiesarray')",
+                                            "actions":  {
+                                                "Append_to_string_variable_6":  {
+                                                    "runAfter":  {
+                                                        "Post_adaptive_card_and_wait_for_a_response_4":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "AppendToStringVariable",
+                                                    "inputs":  {
+                                                        "name":  "AntwoordKomma",
+                                                        "value":  "{\"size\": \"Medium\",\"text\": \"@{items('For_each_4')}\",\"type\": \"TextBlock\",\"wrap\": true,\"weight\": \"Bolder\",\"separator\": true,\"horizontalAlignment\": \"Center\"},{\"size\": \"Medium\",\"text\": \"Antwoordde met:\",\"type\": \"TextBlock\",\"weight\": \"Default\",\"wrap\": true},{\"type\": \"TextBlock\",\"text\": \"*@{body('Post_adaptive_card_and_wait_for_a_response_4')?['data']?['tekst']}*\",\"wrap\": true,\"size\": \"Medium\"},"
+                                                    }
+                                                },
+                                                "Post_adaptive_card_and_wait_for_a_response_4":  {
+                                                    "runAfter":  {
+                                                    },
+                                                    "type":  "ApiConnectionWebhook",
+                                                    "inputs":  {
+                                                        "body":  {
+                                                            "body":  {
+                                                                "messageBody":  "@{outputs('Compose_3')}",
+                                                                "recipient":  {
+                                                                    "to":  "@{items('For_each_4')}"
+                                                                },
+                                                                "updateMessage":  "Thanks for your response!"
+                                                            },
+                                                            "notificationUrl":  "@{listCallbackUrl()}"
+                                                        },
+                                                        "host":  {
+                                                            "connection":  {
+                                                                "name":  "@parameters('$connections')['teams']['connectionId']"
+                                                            }
+                                                        },
+                                                        "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter":  {
+                                                "Compose_3":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Foreach"
+                                        }
+                                    }
+                                },
+                                "Case_-_ja/nee":  {
+                                    "case":  "janee",
+                                    "actions":  {
+                                        "Compose_5":  {
+                                            "runAfter":  {
+                                            },
+                                            "type":  "Compose",
+                                            "inputs":  {
+                                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
+                                                "actions":  [
+                                                    {
+                                                        "data":  {
+                                                            "x":  "confirm"
+                                                        },
+                                                        "title":  "Submit response!",
+                                                        "type":  "Action.Submit"
+                                                    }
+                                                ],
+                                                "body":  [
+                                                    {
+                                                        "size":  "Small",
+                                                        "style":  "Person",
+                                                        "type":  "Image",
+                                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                                    },
+                                                    {
+                                                        "size":  "Large",
+                                                        "text":  "Bericht van SOC Team:",
+                                                        "type":  "TextBlock",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "size":  "Large",
+                                                        "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['titel']}",
+                                                        "type":  "TextBlock",
+                                                        "weight":  "Bolder",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "size":  "Medium",
+                                                        "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['tekst']}",
+                                                        "type":  "TextBlock",
+                                                        "weight":  "Lighter",
+                                                        "wrap":  true
+                                                    },
+                                                    {
+                                                        "choices":  [
+                                                            {
+                                                                "title":  "Ja",
+                                                                "value":  "ja"
+                                                            },
+                                                            {
+                                                                "title":  "Nee",
+                                                                "value":  "nee"
+                                                            }
+                                                        ],
+                                                        "errorMessage":  "Geef een keuze in!",
+                                                        "id":  "keuze",
+                                                        "isRequired":  true,
+                                                        "label":  "Maak een keuze:",
+                                                        "style":  "expanded",
+                                                        "type":  "Input.ChoiceSet"
+                                                    }
+                                                ],
+                                                "type":  "AdaptiveCard",
+                                                "version":  "1.3"
+                                            }
+                                        },
+                                        "For_each_2":  {
+                                            "foreach":  "@variables('entitiesarray')",
+                                            "actions":  {
+                                                "Append_to_string_variable_5":  {
+                                                    "runAfter":  {
+                                                        "Post_adaptive_card_and_wait_for_a_response_2":  [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type":  "AppendToStringVariable",
+                                                    "inputs":  {
+                                                        "name":  "AntwoordKomma",
+                                                        "value":  "{\"size\": \"Medium\",\"text\": \"@{items('For_each_2')}\",\"type\": \"TextBlock\",\"wrap\": true,\"weight\": \"Bolder\",\"separator\": true,\"horizontalAlignment\": \"Center\"},{\"size\": \"Medium\",\"text\": \"Antwoordde **@{body('Post_adaptive_card_and_wait_for_a_response_2')?['data']?['keuze']}** \",\"type\": \"TextBlock\",\"weight\": \"Default\",\"wrap\": true},"
+                                                    }
+                                                },
+                                                "Post_adaptive_card_and_wait_for_a_response_2":  {
+                                                    "runAfter":  {
+                                                    },
+                                                    "type":  "ApiConnectionWebhook",
+                                                    "inputs":  {
+                                                        "body":  {
+                                                            "body":  {
+                                                                "messageBody":  "@{outputs('Compose_5')}",
+                                                                "recipient":  {
+                                                                    "to":  "@{items('For_each_2')}"
+                                                                },
+                                                                "updateMessage":  "Thanks for your response!"
+                                                            },
+                                                            "notificationUrl":  "@{listCallbackUrl()}"
+                                                        },
+                                                        "host":  {
+                                                            "connection":  {
+                                                                "name":  "@parameters('$connections')['teams']['connectionId']"
+                                                            }
+                                                        },
+                                                        "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter":  {
+                                                "Compose_5":  [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type":  "Foreach"
+                                        }
+                                    }
+                                }
+                            },
+                            "default":  {
+                                "actions":  {
+                                    "Compose_2":  {
+                                        "runAfter":  {
+                                        },
+                                        "type":  "Compose",
+                                        "inputs":  {
+                                            "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
+                                            "body":  [
+                                                {
+                                                    "size":  "Small",
+                                                    "style":  "Person",
+                                                    "type":  "Image",
+                                                    "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                                },
+                                                {
+                                                    "size":  "Large",
+                                                    "text":  "Bericht van SOC Team:",
+                                                    "type":  "TextBlock",
+                                                    "wrap":  true
+                                                },
+                                                {
+                                                    "size":  "Large",
+                                                    "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['titel']}",
+                                                    "type":  "TextBlock",
+                                                    "weight":  "Bolder",
+                                                    "wrap":  true
+                                                },
+                                                {
+                                                    "size":  "Medium",
+                                                    "text":  "@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['tekst']}",
+                                                    "type":  "TextBlock",
+                                                    "weight":  "Lighter",
+                                                    "wrap":  true
+                                                }
+                                            ],
+                                            "type":  "AdaptiveCard",
+                                            "version":  "1.3"
+                                        }
+                                    },
+                                    "Delete_blob_(V2)_2":  {
+                                        "runAfter":  {
+                                            "For_each":  [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type":  "ApiConnection",
+                                        "inputs":  {
+                                            "headers":  {
+                                                "SkipDeleteIfFileNotFoundOnServer":  false
+                                            },
+                                            "host":  {
+                                                "connection":  {
+                                                    "name":  "@parameters('$connections')['azureblob']['connectionId']"
+                                                }
+                                            },
+                                            "method":  "delete",
+                                            "path":  "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files/@{encodeURIComponent(encodeURIComponent('/',parameters('Storage account blob container name'),'/',variables('Blob')))}"
+                                        }
+                                    },
+                                    "For_each":  {
+                                        "foreach":  "@variables('entitiesarray')",
+                                        "actions":  {
+                                            "Post_card_in_a_chat_or_channel":  {
+                                                "runAfter":  {
+                                                },
+                                                "type":  "ApiConnection",
+                                                "inputs":  {
+                                                    "body":  {
+                                                        "messageBody":  "@{outputs('Compose_2')}",
+                                                        "recipient":  "@{items('For_each')}"
+                                                    },
+                                                    "host":  {
+                                                        "connection":  {
+                                                            "name":  "@parameters('$connections')['teams']['connectionId']"
+                                                        }
+                                                    },
+                                                    "method":  "post",
+                                                    "path":  "/v1.0/teams/conversation/adaptivecard/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
+                                                }
+                                            }
+                                        },
+                                        "runAfter":  {
+                                            "Compose_2":  [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type":  "Foreach"
+                                    },
+                                    "Terminate":  {
+                                        "runAfter":  {
+                                            "Delete_blob_(V2)_2":  [
+                                                "Succeeded"
+                                            ]
+                                        },
+                                        "type":  "Terminate",
+                                        "inputs":  {
+                                            "runStatus":  "Succeeded"
+                                        }
+                                    }
+                                }
+                            },
+                            "expression":  "@body('Post_adaptive_card_and_wait_for_a_response')?['data']?['keuze']",
+                            "type":  "Switch"
+                        }
+                    },
+                    "outputs":  {
+                    }
+                },
+                "parameters":  {
+                    "$connections":  {
+                        "value":  {
+                            "SentinelTriageAssistant":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
+                                "connectionName":  "[variables('SentineltriageassistantConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/customApis/Sentineltriageassistant')]"
+                            },
+                            "azureblob":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('AzureblobConnectionName'))]",
+                                "connectionName":  "[variables('AzureblobConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureblob')]"
+                            },
+                            "azuresentinel":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                                "connectionName":  "[variables('MicrosoftSentinelConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
+                                "connectionProperties":  {
+                                    "authentication":  {
+                                        "type":  "ManagedServiceIdentity"
+                                    }
+                                }
+                            },
+                            "teams":  {
+                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
+                                "connectionName":  "[variables('TeamsConnectionName')]",
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+                            }
+                        }
+                    }
+                }
+            },
+            "name":  "[parameters('PlaybookName')]",
+            "type":  "Microsoft.Logic/workflows",
+            "location":  "[resourceGroup().location]",
+            "tags":  {
+                "use case":  "5"
+            },
+            "identity":  {
+                "type":  "SystemAssigned"
+            },
+            "apiVersion":  "2017-07-01",
+            "dependsOn":  [
+                "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
+                "[resourceId('Microsoft.Web/connections', variables('AzureblobConnectionName'))]",
+                "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]"
+            ]
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('SentineltriageassistantConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('SentineltriageassistantConnectionName')]",
+                "customParameterValues":  {
+                },
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/customApis/Sentineltriageassistant')]"
+                }
+            }
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('AzureblobConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('AzureblobConnectionName')]",
+                "customParameterValues":  {
+                },
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureblob')]"
+                }
+            }
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('MicrosoftSentinelConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('MicrosoftSentinelConnectionName')]",
+                "customParameterValues":  {
+                },
+                "parameterValueType":  "Alternative",
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
+                }
+            }
+        },
+        {
+            "type":  "Microsoft.Web/connections",
+            "apiVersion":  "2016-06-01",
+            "name":  "[variables('TeamsConnectionName')]",
+            "location":  "[resourceGroup().location]",
+            "kind":  "V1",
+            "properties":  {
+                "displayName":  "[variables('TeamsConnectionName')]",
+                "customParameterValues":  {
+                },
+                "api":  {
+                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+                }
+            }
+        }
+    ]
+}
