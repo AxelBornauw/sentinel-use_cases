@@ -25,7 +25,11 @@
         "Storage account blob container name": {
             "type": "string",
             "defaultValue": "entities"
+        },
+        "Tenant": {
+            "type": "string"
         }
+
     },
     "variables": {
         "linked-template": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-Base/azuredeploy.json",
@@ -57,6 +61,9 @@
                     },
                     "PlaybookNameBlokkeren": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-BlockUser')]"
+                    },
+                    "tenant": {
+                        "value": "[parameters('Tenant')]"
                     }
                 }
             }

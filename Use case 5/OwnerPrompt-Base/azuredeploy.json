@@ -421,7 +421,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', @parameters('PlaybookNameBlokkeren'))]",
+                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBlokkeren'))]",
                                                     "PlaybookName": "Block user playbook",
                                                     "TenantId": "@parameters('tenant')"
                                                 },
@@ -452,7 +452,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', @parameters('PlaybookNameInvestigaten'))]",
+                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigaten'))]",
                                                     "PlaybookName": "Further investigation",
                                                     "TenantId": "@parameters('tenant')"
                                                 },
@@ -483,7 +483,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', @parameters('PlaybookNameTeams'))]",
+                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameTeams'))]",
                                                     "PlaybookName": "Teams bericht",
                                                     "TenantId": "@parameters('tenant')"
                                                 },
