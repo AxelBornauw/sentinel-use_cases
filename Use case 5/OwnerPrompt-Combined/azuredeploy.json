@@ -8,7 +8,7 @@
         "PlaybookName_OwnerPrompt-Teams": {
             "type": "string"
         },
-        "PlaybookName_OwnerPrompt-CustomTeams)": {
+        "PlaybookName_OwnerPrompt-CustomTeams": {
             "type": "string",
             "defaultValue": "OwnerPrompt-CustomTeams"
         },
