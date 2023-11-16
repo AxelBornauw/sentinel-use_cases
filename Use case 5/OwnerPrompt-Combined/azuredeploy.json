@@ -3,11 +3,11 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "PlaybookName_OwnerPrompt-Base": {
-            "type": "string",
+            "type": "string"
             //"defaultValue": "OwnerPrompt-Base"
         },
         "PlaybookName_OwnerPrompt-Teams": {
-            "type": "string",
+            "type": "string"
             //"defaultValue": "OwnerPrompt-Teams"
         },
         "PlaybookName_OwnerPrompt-CustomTeams)": {
