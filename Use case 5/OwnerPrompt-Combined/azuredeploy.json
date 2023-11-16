@@ -17,7 +17,7 @@
         {
             "properties": {
                 "mode": "Incremental",
-                "apiVersion": "2022-12-01",
+                "ApiVersion": "2022-12-01", 
                 "templateLink": {
                     "uri": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-CustomTeams/azuredeploy.json",
                     "contentVersion": "1.0.0.0"
