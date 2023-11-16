@@ -33,7 +33,7 @@
                 "templateLink": {
                     "uri": "[variables('linked-template-two')]",
                     "contentVersion": "1.0.0.0"
-                },
+                }
             }
         }
     ]
