@@ -1,6 +1,12 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Storage account blob container name": {
+            "type": "string",
+            "defaultValue": "entities"
+        }
+    },
     "variables": {
         "linked-template": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-Base/azuredeploy.json",
         "linked-template-two": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-Teams/azuredeploy.json",
@@ -33,6 +39,9 @@
                 "templateLink": {
                     "uri": "[variables('linked-template-two')]",
                     "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "Storage account blob container name": {"value": "[parameters('name')]"}
                 }
             }
         }
