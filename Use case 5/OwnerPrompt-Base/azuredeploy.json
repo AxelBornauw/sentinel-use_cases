@@ -461,7 +461,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "@parameters(Investigaten)",
+                                                    "LogicAppResourceId": "@parameters('Investigaten')",
                                                     "PlaybookName": "Further investigation",
                                                     "TenantId": "@parameters('tenant')"
                                                 },
