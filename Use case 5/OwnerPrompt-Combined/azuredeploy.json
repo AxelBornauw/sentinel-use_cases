@@ -7,19 +7,19 @@
             "type": "string"
         },
         "PlaybookName_OwnerPrompt-Teams": {
-            "defaultValue": "OwnerPrompt-Base",
+            "defaultValue": "OwnerPrompt-Teams",
             "type": "string"
         },
         "PlaybookName_OwnerPrompt-CustomTeams": {
-            "defaultValue": "OwnerPrompt-Base",
+            "defaultValue": "OwnerPrompt-CustomTeams",
             "type": "string"
         },
         "PlaybookName_OwnerPrompt-BlockUser": {
-            "defaultValue": "OwnerPrompt-Base",
+            "defaultValue": "OwnerPrompt-BlockUser",
             "type": "string"
         },
         "PlaybookName_OwnerPrompt-InvestigateEntity": {
-            "defaultValue": "OwnerPrompt-Base",
+            "defaultValue": "OwnerPrompt-InvestigateEntity",
             "type": "string"
         },
         "Storage account blob container name": {
