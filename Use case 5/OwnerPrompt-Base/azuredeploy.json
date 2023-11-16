@@ -6,10 +6,7 @@
             "type": "string"
         },
         "tenant": {
-            "type": "String",
-            "metadata": {
-                "description": "Enter value for tenant"
-            }
+            "type": "String"
         },
         "PlaybookNameTeams": {
             "type": "string"
@@ -42,6 +39,18 @@
                         },
                         "tenant": {
                             "defaultValue": "[parameters('tenant')]",
+                            "type": "String"
+                        },
+                        "TeamsBericht": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameTeams'))]",
+                            "type": "String"
+                        },
+                        "Blokkeren": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBlokkeren'))]",
+                            "type": "String"
+                        },
+                        "Investigaten": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigaten'))]",
                             "type": "String"
                         }
                     },
@@ -421,7 +430,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBlokkeren'))]",
+                                                    "LogicAppResourceId": "@parameters('Blokkeren')",
                                                     "PlaybookName": "Block user playbook",
                                                     "TenantId": "@parameters('tenant')"
                                                 },
@@ -452,7 +461,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigaten'))]",
+                                                    "LogicAppResourceId": "@parameters(Investigaten)",
                                                     "PlaybookName": "Further investigation",
                                                     "TenantId": "@parameters('tenant')"
                                                 },
@@ -483,7 +492,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameTeams'))]",
+                                                    "LogicAppResourceId": "@parameters('TeamsBericht')",
                                                     "PlaybookName": "Teams bericht",
                                                     "TenantId": "@parameters('tenant')"
                                                 },

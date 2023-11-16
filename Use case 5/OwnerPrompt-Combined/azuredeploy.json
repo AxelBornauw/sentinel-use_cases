@@ -29,7 +29,6 @@
         "Tenant": {
             "type": "string"
         }
-
     },
     "variables": {
         "linked-template": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-Base/azuredeploy.json",
@@ -87,6 +86,44 @@
                     },
                     "Storage account blob container name": {
                         "value": "[parameters('Storage account blob container name')]"
+                    },
+                    "PlaybookNameCustomTeams": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-CustomTeams')]"
+                    },
+                    "PlaybookNameBase": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-Base')]"
+                    },
+                    "tenant": {
+                        "value": "[parameters('tenant')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "customteams",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments','teams')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linked-template-three')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-CustomTeams')]"
+                    },
+                    "Storage account blob container name": {
+                        "value": "[parameters('Storage account blob container name')]"
+                    },
+                    "PlaybookNameInvestigaten": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity')]"
+                    },
+                    "tenant": {
+                        "value": "[parameters('tenant')]"
                     }
                 }
             }

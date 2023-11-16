@@ -6,10 +6,16 @@
             "type": "string"
         },
         "Storage account blob container name": {
-            "type": "String",
-            "metadata": {
-                "description": "Enter value for Storage account blob container name"
-            }
+            "type": "String"
+        },
+        "PlaybookNameCustomTeams": {
+            "type": "string"
+        },
+        "PlaybookNameBase": {
+            "type": "string"
+        },
+        "tenant": {
+            "type": "string"
         }
     },
     "variables": {
@@ -34,6 +40,18 @@
                         },
                         "Storage account blob container name": {
                             "defaultValue": "[parameters('Storage account blob container name')]",
+                            "type": "String"
+                        },
+                        "tenant": {
+                            "defaultValue": "[parameters('tenant')]",
+                            "type": "String"
+                        },
+                        "CustomTeamsBericht": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameCustomTeams'))]",
+                            "type": "String"
+                        },
+                        "Keerterug": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBase'))]",
                             "type": "String"
                         }
                     },
@@ -367,9 +385,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/AnomalousLogin",
+                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/AnomalousLogin')]",
                                                     "PlaybookName": "Anomalous login",
-                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
+                                                    "TenantId": "@parameters('tenant')"
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -398,9 +416,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/OwnerPrompt-CustomTeams",
+                                                    "LogicAppResourceId": "@parameters('CustomTeamsBericht')",
                                                     "PlaybookName": "Custom message playbook",
-                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
+                                                    "TenantId": "@parameters('tenant')"
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -429,9 +447,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/ESXI-Server",
+                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/ESXI-Server')]",
                                                     "PlaybookName": "ESXI-Server",
-                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
+                                                    "TenantId": "@parameters('tenant')"
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -460,9 +478,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/MultipleLoginsFailed",
+                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/MultipleLoginsFailed')]",
                                                     "PlaybookName": "Multiple Logins Failed",
-                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
+                                                    "TenantId": "@parameters('tenant')"
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -491,9 +509,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/OwnerPrompt-Base",
+                                                    "LogicAppResourceId": "@parameters('Keerterug')",
                                                     "PlaybookName": "Base body",
-                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
+                                                    "TenantId": "@parameters('tenant')"
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -522,9 +540,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/UnsanctionedApp",
+                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/UnsanctionedApp')]",
                                                     "PlaybookName": "Unsanctioned Cloud App",
-                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
+                                                    "TenantId": "@parameters('tenant')"
                                                 },
                                                 "host": {
                                                     "connection": {
