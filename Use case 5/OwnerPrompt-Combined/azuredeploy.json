@@ -4,11 +4,11 @@
     "parameters": {
         "PlaybookName_OwnerPrompt-Base": {
             "type": "string",
-            "defaultValue": "OwnerPrompt-Base"
+            //"defaultValue": "OwnerPrompt-Base"
         },
         "PlaybookName_OwnerPrompt-Teams": {
             "type": "string",
-            "defaultValue": "OwnerPrompt-Teams"
+            //"defaultValue": "OwnerPrompt-Teams"
         },
         "PlaybookName_OwnerPrompt-CustomTeams)": {
             "type": "string",

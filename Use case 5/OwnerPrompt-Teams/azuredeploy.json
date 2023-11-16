@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "PlaybookName": {
-            //    "defaultValue": "OwnerPrompt-Teams",
+            "defaultValue": "OwnerPrompt-Teams",
             "type": "string"
         },
         "Storage account blob container name": {
