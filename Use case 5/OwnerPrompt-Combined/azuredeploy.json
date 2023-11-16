@@ -2,6 +2,26 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "PlaybookName (OwnerPrompt-Base)": {
+            "type": "string",
+            "defaultValue": "OwnerPrompt-Base"
+        },
+        "PlaybookName (OwnerPrompt-Teams)": {
+            "type": "string",
+            "defaultValue": "OwnerPrompt-Teams"
+        },
+        "PlaybookName (OwnerPrompt-CustomTeams)": {
+            "type": "string",
+            "defaultValue": "OwnerPrompt-CustomTeams"
+        },
+        "PlaybookName (OwnerPrompt-BlockUser)": {
+            "type": "string",
+            "defaultValue": "OwnerPrompt-BlockUser"
+        },
+        "PlaybookName (OwnerPrompt-InvestigateEntity)": {
+            "type": "string",
+            "defaultValue": "OwnerPrompt-InvestigateEntity"
+        },
         "Storage account blob container name": {
             "type": "string",
             "defaultValue": "entities"
@@ -24,6 +44,11 @@
                 "templateLink": {
                     "uri": "[variables('linked-template')]",
                     "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName (OwnerPrompt-Base)": {
+                        "value": "[parameters('PlaybookName (OwnerPrompt-Base)')]"
+                    }
                 }
             }
         },
@@ -41,7 +66,12 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "Storage account blob container name": {"value": "[parameters('name')]"}
+                    "PlaybookName (OwnerPrompt-Teams)": {
+                        "value": "[parameters('PlaybookName (OwnerPrompt-Teams)')]"
+                    },
+                    "Storage account blob container name": {
+                        "value": "[parameters('Storage account blob container name')]"
+                    }
                 }
             }
         }
