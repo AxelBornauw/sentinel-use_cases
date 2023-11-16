@@ -48,16 +48,7 @@
                 "parameters": {
                     "PlaybookName": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-Base')]"
-                    },
-                    "PlaybookNameTeams": {
-                        "value": "[parameters('PlaybookName_OwnerPrompt-Teams')]"
-                    },
-                    "PlaybookNameInvestigaten": {
-                        "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity')]"
-                    },
-                    "PlaybookNameBlokkeren": {
-                        "value": "[parameters('PlaybookName_OwnerPrompt-BlockUser')]"
-                    },
+                    }
                 }
             }
         },

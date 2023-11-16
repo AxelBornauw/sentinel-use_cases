@@ -4,22 +4,7 @@
     "parameters": {
         "PlaybookName": {
             "type": "string"
-        },
-        "tenant": {
-            "type": "String",
-            "metadata": {
-                "description": "Enter value for tenant"
-            }
-        },
-        "PlaybookNameTeams": {
-            "type": "string"
-        },
-        "PlaybookNameBlokkeren": {
-            "type": "string"
-        },
-        "PlaybookNameInvestigaten": {
-            "type": "string"
-        },
+        }
     },
     "variables": {
         "SentineltriageassistantConnectionName": "SentinelTriageAssistant",
@@ -39,10 +24,6 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
-                        },
-                        "tenant": {
-                            "defaultValue": "[parameters('tenant')]",
-                            "type": "String"
                         }
                     },
                     "triggers": {
@@ -297,7 +278,7 @@
                                     "inputs": {
                                         "host": {
                                             "connection": {
-                                                "name": "@parameters('$connections')['azuread_1']['connectionId']"
+                                                "name": "@parameters('$connections')['azuread']['connectionId']"
                                             }
                                         },
                                         "method": "get",
@@ -398,7 +379,7 @@
                                 },
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['teams_1']['connectionId']"
+                                        "name": "@parameters('$connections')['teams']['connectionId']"
                                     }
                                 },
                                 "path": "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
@@ -411,7 +392,7 @@
                                 ]
                             },
                             "cases": {
-                                "Blokkeren": {
+                                "Case": {
                                     "case": "blokkeren",
                                     "actions": {
                                         "Run_Playbook_Module_3": {
@@ -421,9 +402,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', @parameters('PlaybookNameBlokkeren'))]",
+                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/OwnerPrompt-BlockUser",
                                                     "PlaybookName": "Block user playbook",
-                                                    "TenantId": "@parameters('tenant')"
+                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -452,9 +433,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', @parameters('PlaybookNameInvestigaten'))]",
+                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/OwnerPrompt-InvestigateEntity",
                                                     "PlaybookName": "Further investigation",
-                                                    "TenantId": "@parameters('tenant')"
+                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -483,9 +464,9 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', @parameters('PlaybookNameTeams'))]",
+                                                    "LogicAppResourceId": "/subscriptions/ca8ecf1f-c60f-4c3b-9aa8-238c5b6f5e20/resourceGroups/axeltest/providers/Microsoft.Logic/workflows/OwnerPrompt-Teams",
                                                     "PlaybookName": "Teams bericht",
-                                                    "TenantId": "@parameters('tenant')"
+                                                    "TenantId": "90625911-bfac-4bb3-9734-db8cd7699a52"
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -534,7 +515,7 @@
                                 "connectionName": "[variables('SentineltriageassistantConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/customApis/', variables('SentineltriageassistantConnectionName'))]"
                             },
-                            "azuread_1": {
+                            "azuread": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
                                 "connectionName": "[variables('AzureadConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
@@ -549,7 +530,7 @@
                                     }
                                 }
                             },
-                            "teams_1": {
+                            "teams": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
                                 "connectionName": "[variables('TeamsConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
