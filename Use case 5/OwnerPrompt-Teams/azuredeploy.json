@@ -142,7 +142,7 @@
                                         "id": "entities",
                                         "isMultiSelect": true,
                                         "isRequired": true,
-                                        "label": "Kies ��n of meerdere entities om verder te onderzoeken.",
+                                        "label": "Kies 1 of meerdere entities om verder te onderzoeken.",
                                         "style": "compact",
                                         "type": "Input.ChoiceSet"
                                     },
