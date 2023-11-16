@@ -546,6 +546,7 @@
                 }
             },
             "name": "[parameters('PlaybookName')]",
+            "apiVersion": "2023-07-01",
             "type": "Microsoft.Resources/deployments",
             "location": "[resourceGroup().location]",
             "tags": {
