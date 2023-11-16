@@ -19,7 +19,7 @@
         },
         "PlaybookNameInvestigaten": {
             "type": "string"
-        },
+        }
     },
     "variables": {
         "SentineltriageassistantConnectionName": "SentinelTriageAssistant",
