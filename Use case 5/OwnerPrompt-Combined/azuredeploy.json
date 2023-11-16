@@ -9,16 +9,13 @@
             "type": "string"
         },
         "PlaybookName_OwnerPrompt-CustomTeams": {
-            "type": "string",
-            "defaultValue": "OwnerPrompt-CustomTeams"
+            "type": "string"
         },
         "PlaybookName_OwnerPrompt-BlockUser": {
-            "type": "string",
-            "defaultValue": "OwnerPrompt-BlockUser"
+            "type": "string"
         },
         "PlaybookName_OwnerPrompt-InvestigateEntity": {
-            "type": "string",
-            "defaultValue": "OwnerPrompt-InvestigateEntity"
+            "type": "string"
         },
         "Storage account blob container name": {
             "type": "string",
