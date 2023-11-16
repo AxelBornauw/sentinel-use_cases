@@ -2,23 +2,23 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "PlaybookName (OwnerPrompt-Base)": {
+        "PlaybookName-OwnerPrompt-Base": {
             "type": "string",
             "defaultValue": "OwnerPrompt-Base"
         },
-        "PlaybookName (OwnerPrompt-Teams)": {
+        "PlaybookName-OwnerPrompt-Teams": {
             "type": "string",
             "defaultValue": "OwnerPrompt-Teams"
         },
-        "PlaybookName (OwnerPrompt-CustomTeams)": {
+        "PlaybookName-OwnerPrompt-CustomTeams": {
             "type": "string",
             "defaultValue": "OwnerPrompt-CustomTeams"
         },
-        "PlaybookName (OwnerPrompt-BlockUser)": {
+        "PlaybookName-OwnerPrompt-BlockUser": {
             "type": "string",
             "defaultValue": "OwnerPrompt-BlockUser"
         },
-        "PlaybookName (OwnerPrompt-InvestigateEntity)": {
+        "PlaybookName-OwnerPrompt-InvestigateEntity": {
             "type": "string",
             "defaultValue": "OwnerPrompt-InvestigateEntity"
         },
@@ -47,7 +47,7 @@
                 },
                 "parameters": {
                     "PlaybookName": {
-                        "value": "[parameters('PlaybookName (OwnerPrompt-Base)')]"
+                        "value": "[parameters('PlaybookName-OwnerPrompt-Base')]"
                     }
                 }
             }
@@ -67,7 +67,7 @@
                 },
                 "parameters": {
                     "PlaybookName": {
-                        "value": "[parameters('PlaybookName (OwnerPrompt-Teams)')]"
+                        "value": "[parameters('PlaybookName-OwnerPrompt-Teams')]"
                     },
                     "Storage account blob container name": {
                         "value": "[parameters('Storage account blob container name')]"
