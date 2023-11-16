@@ -46,7 +46,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "PlaybookName (OwnerPrompt-Base)": {
+                    "PlaybookName": {
                         "value": "[parameters('PlaybookName (OwnerPrompt-Base)')]"
                     }
                 }
