@@ -8,7 +8,7 @@
         "Storage account blob container name": {
             "type": "String"
         },
-        "PlaybookNameInvestigaten": {
+        "PlaybookNameInvestigateEntity": {
             "type": "string"
         },
         "tenant": {
@@ -42,8 +42,8 @@
                             "defaultValue": "[parameters('tenant')]",
                             "type": "String"
                         },
-                        "TeamsBericht": {
-                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigaten'))]",
+                        "InvestigateEntity": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigateEntity'))]",
                             "type": "String"
                         }
                     },
@@ -66,7 +66,7 @@
                     "actions": {
                         "Append_to_string_variable_4": {
                             "runAfter": {
-                                "Post_message_in_a_chat_or_channel": [
+                                "Delete_blob_(V2)": [
                                     "Succeeded"
                                 ]
                             },
@@ -277,7 +277,7 @@
                                         "body": {
                                             "AddIncidentComments": false,
                                             "BaseModuleBody": "@{body('Base_Module')}",
-                                            "LogicAppResourceId": "@parameters('PlaybookNameInvestigaten')",
+                                            "LogicAppResourceId": "@parameters('InvestigateEntity')",
                                             "PlaybookName": "Entities onderzoeken playbook",
                                             "TenantId": "@parameters('tenant')"
                                         },
@@ -356,7 +356,7 @@
                                 }
                             }
                         },
-                        "Initialize_variable": {
+                        "Initialize_variable_-_Antwoord": {
                             "runAfter": {
                                 "Initialize_variable_-_AntwoordKomma": [
                                     "Succeeded"
@@ -541,7 +541,13 @@
                         },
                         "Post_message_in_a_chat_or_channel": {
                             "runAfter": {
-                                "Delete_blob_(V2)": [
+                                "Initialize_variable": [
+                                    "Succeeded"
+                                ],
+                                "Initialize_variable_-_Custom_keuze_array": [
+                                    "Succeeded"
+                                ],
+                                "Initialize_variable_-_Onderzoek_verder": [
                                     "Succeeded"
                                 ]
                             },
@@ -563,13 +569,7 @@
                         },
                         "Switch": {
                             "runAfter": {
-                                "Initialize_variable": [
-                                    "Succeeded"
-                                ],
-                                "Initialize_variable_-_Custom_keuze_array": [
-                                    "Succeeded"
-                                ],
-                                "Initialize_variable_-_Onderzoek_verder": [
+                                "Post_message_in_a_chat_or_channel": [
                                     "Succeeded"
                                 ]
                             },
@@ -807,7 +807,7 @@
                                                     "type": "AppendToStringVariable",
                                                     "inputs": {
                                                         "name": "AntwoordKomma",
-                                                        "value": "{\"size\": \"Medium\",\"text\": \"@{items('For_each_3')}\",\"type\": \"TextBlock\",\"wrap\": true,\"weight\": \"Bolder\",\"separator\": true,\"horizontalAlignment\": \"Center\"},{\"size\": \"Medium\",\"text\":\"Antwoordde **@{body('Post_adaptive_card_and_wait_for_a_response_3')?['data']?['keuze']}**\",\"type\": \"TextBlock\",\"weight\": \"Default\",\"wrap\": true},{\"type\": \"TextBlock\",\"text\": \"Met reden (enkel bij 'Ja'):\",\"wrap\": true,\"size\": \"Default\"},{\"type\": \"TextBlock\",\"text\": \"*@{body('Post_adaptive_card_and_wait_for_a_response_3')?['data']?['tekst']}*\",\"wrap\": true,\"size\": \"Medium\"},"
+                                                        "value": "{\"size\": \"Medium\",\"text\": \"@{items('For_each_3')}\",\"type\": \"TextBlock\",\"wrap\": true,\"weight\": \"Bolder\",\"separator\": true,\"horizontalAlignment\": \"Center\"},{\"size\": \"Medium\",\"text\":\"Antwoordde **@{body('Post_adaptive_card_and_wait_for_a_response_3')?['data']?['keuze']}**\",\"type\": \"TextBlock\",\"weight\": \"Default\",\"wrap\": true},{\"type\": \"TextBlock\",\"text\": \"Met reden (enkel bij 'Ja'):\",\"wrap\": true,\"size\": \"Default\"},{\"type\": \"TextBlock\",\"text\": \"@{body('Post_adaptive_card_and_wait_for_a_response_3')?['data']?['tekst']}\",\"wrap\": true,\"size\": \"Medium\"},"
                                                     }
                                                 },
                                                 "Post_adaptive_card_and_wait_for_a_response_3": {
@@ -911,7 +911,7 @@
                                                     "type": "AppendToStringVariable",
                                                     "inputs": {
                                                         "name": "AntwoordKomma",
-                                                        "value": "{\"size\": \"Medium\",\"text\": \"@{items('For_each_4')}\",\"type\": \"TextBlock\",\"wrap\": true,\"weight\": \"Bolder\",\"separator\": true,\"horizontalAlignment\": \"Center\"},{\"size\": \"Medium\",\"text\": \"Antwoordde met:\",\"type\": \"TextBlock\",\"weight\": \"Default\",\"wrap\": true},{\"type\": \"TextBlock\",\"text\": \"*@{body('Post_adaptive_card_and_wait_for_a_response_4')?['data']?['tekst']}*\",\"wrap\": true,\"size\": \"Medium\"},"
+                                                        "value": "{\"size\": \"Medium\",\"text\": \"@{items('For_each_4')}\",\"type\": \"TextBlock\",\"wrap\": true,\"weight\": \"Bolder\",\"separator\": true,\"horizontalAlignment\": \"Center\"},{\"size\": \"Medium\",\"text\": \"Antwoordde met:\",\"type\": \"TextBlock\",\"weight\": \"Default\",\"wrap\": true},{\"type\": \"TextBlock\",\"text\": \"@{body('Post_adaptive_card_and_wait_for_a_response_4')?['data']?['tekst']}\",\"wrap\": true,\"size\": \"Medium\"},"
                                                     }
                                                 },
                                                 "Post_adaptive_card_and_wait_for_a_response_4": {

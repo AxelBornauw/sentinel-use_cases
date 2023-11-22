@@ -11,10 +11,10 @@
         "PlaybookNameTeams": {
             "type": "string"
         },
-        "PlaybookNameBlokkeren": {
+        "PlaybookNameBlockUser": {
             "type": "string"
         },
-        "PlaybookNameInvestigaten": {
+        "PlaybookNameInvestigateEntity": {
             "type": "string"
         }
     },
@@ -45,12 +45,12 @@
                             "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameTeams'))]",
                             "type": "String"
                         },
-                        "Blokkeren": {
-                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBlokkeren'))]",
+                        "BlockUser": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBlockUser'))]",
                             "type": "String"
                         },
-                        "Investigaten": {
-                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigaten'))]",
+                        "InvestigateEntity": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigateEntity'))]",
                             "type": "String"
                         }
                     },
@@ -430,7 +430,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "@parameters('Blokkeren')",
+                                                    "LogicAppResourceId": "@parameters('BlockUser')",
                                                     "PlaybookName": "Block user playbook",
                                                     "TenantId": "@parameters('tenant')"
                                                 },
@@ -461,7 +461,7 @@
                                                 "body": {
                                                     "AddIncidentComments": false,
                                                     "BaseModuleBody": "@{body('Base_Module')}",
-                                                    "LogicAppResourceId": "@parameters('Investigaten')",
+                                                    "LogicAppResourceId": "@parameters('InvestigateEntity')",
                                                     "PlaybookName": "Further investigation",
                                                     "TenantId": "@parameters('tenant')"
                                                 },

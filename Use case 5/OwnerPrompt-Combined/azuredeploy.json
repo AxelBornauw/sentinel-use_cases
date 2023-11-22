@@ -55,10 +55,10 @@
                     "PlaybookNameTeams": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-Teams')]"
                     },
-                    "PlaybookNameInvestigaten": {
+                    "PlaybookNameInvestigateEntity": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity')]"
                     },
-                    "PlaybookNameBlokkeren": {
+                    "PlaybookNameBlockUser": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-BlockUser')]"
                     },
                     "tenant": {
@@ -119,7 +119,7 @@
                     "Storage account blob container name": {
                         "value": "[parameters('Storage account blob container name')]"
                     },
-                    "PlaybookNameInvestigaten": {
+                    "PlaybookNameInvestigateEntity": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity')]"
                     },
                     "tenant": {
