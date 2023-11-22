@@ -194,6 +194,10 @@
                                             {
                                                 "title": "Account blokkeren",
                                                 "value": "blokkeren"
+                                            },
+                                            {
+                                                "title":  "Assistant sluiten",
+                                                "value":  "cancel"
                                             }
                                         ],
                                         "errorMessage": "Geef een keuze in!",
@@ -516,17 +520,7 @@
                             },
                             "default": {
                                 "actions": {
-                                    "Terminate": {
-                                        "runAfter": {},
-                                        "type": "Terminate",
-                                        "inputs": {
-                                            "runError": {
-                                                "code": "1",
-                                                "message": "Teams bericht error"
-                                            },
-                                            "runStatus": "Failed"
-                                        }
-                                    }
+
                                 }
                             },
                             "expression": "@body('Post_Adaptive_Card_and_wait_for_a_response')?['data']?['keuze']",

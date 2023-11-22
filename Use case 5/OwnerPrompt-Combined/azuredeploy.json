@@ -23,10 +23,12 @@
             "type": "string"
         },
         "Storage account blob container name": {
-            "type": "string",
-            "defaultValue": "entities"
+            "type": "string"
         },
         "Tenant": {
+            "type": "string"
+        },
+        "ResetPassword Client ID": {
             "type": "string"
         }
     },
@@ -127,6 +129,41 @@
                     }
                 }
             }
-        }
+        },
+        {
+            "name": "block",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments','customteams')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linked-template-four')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-BlockUser')]"
+                    },
+                    "PlaybookNameBase": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-Base')]"
+                    },
+                    "PlaybookNameTeams": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-Teams')]"
+                    },
+                    "PlaybookNameInvestigateEntity": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity')]"
+                    },
+                    "tenant": {
+                        "value": "[parameters('tenant')]"
+                    },
+                    "ResetPassword Client ID": {
+                        "value": "[parameters('ResetPassword Client ID')]"
+                    }
+                }
+            }
+        }        
     ]
 }
