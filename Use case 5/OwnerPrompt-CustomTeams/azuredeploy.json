@@ -541,7 +541,7 @@
                         },
                         "Post_message_in_a_chat_or_channel": {
                             "runAfter": {
-                                "Initialize_variable": [
+                                "Initialize_variable_-_Antwoord": [
                                     "Succeeded"
                                 ],
                                 "Initialize_variable_-_Custom_keuze_array": [
