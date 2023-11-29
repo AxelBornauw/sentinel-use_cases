@@ -104,10 +104,10 @@
                         },
                         "Compose": {
                             "runAfter": {
-                                "Initialize_variable_-_Accounts": [
+                                "Condition_-empty_accounts": [
                                     "Succeeded"
                                 ],
-                                "Condition": [
+                                "Condition_-_empty_ips": [
                                     "Succeeded"
                                 ]
                             },
@@ -337,7 +337,7 @@
                                     {
                                         "name": "Accounts",
                                         "type": "string",
-                                        "value": "@{substring(variables('AccountKomma'),0,sub(length(variables('AccountKomma')),2))}"
+                                        "value": ""
                                     }
                                 ]
                             }
@@ -358,6 +358,36 @@
                                 ]
                             }
                         },
+                        "Condition_-_empty_accounts": {
+                            "actions": {
+                                "Set_variable_-_Accounts": {
+                                    "inputs": {
+                                        "name": "Accounts",
+                                        "value": "@{substring(variables('AccountKomma'),0,sub(length(variables('AccountKomma')),2))}"
+                                    },
+                                    "runAfter": {},
+                                    "type": "SetVariable"
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "not": {
+                                            "equals": [
+                                                "@length(variables('AccountKomma'))",
+                                                0
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "runAfter": {
+                                "Initialize_variable_-_Accounts": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "If"
+                        },
                         "Initialize_variable_-_IPs": {
                             "runAfter": {
                                 "For_each": [
@@ -375,9 +405,9 @@
                                 ]
                             }
                         },
-                        "Condition": {
+                        "Condition_-_empty_ips": {
                             "actions": {
-                                "Set_variable": {
+                                "Set_variable_-_IPs": {
                                     "inputs": {
                                         "name": "IPs",
                                         "value": "@{substring(variables('IPKomma'),0,sub(length(variables('IPKomma')),2))}"
