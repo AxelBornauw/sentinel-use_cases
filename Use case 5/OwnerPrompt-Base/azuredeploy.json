@@ -104,7 +104,7 @@
                         },
                         "Compose": {
                             "runAfter": {
-                                "Condition_-empty_accounts": [
+                                "Condition_-_empty_accounts": [
                                     "Succeeded"
                                 ],
                                 "Condition_-_empty_ips": [
