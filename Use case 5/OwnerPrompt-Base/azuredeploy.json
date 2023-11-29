@@ -107,7 +107,7 @@
                                 "Initialize_variable_-_Accounts": [
                                     "Succeeded"
                                 ],
-                                "Initialize_variable_-_IPs": [
+                                "Condition": [
                                     "Succeeded"
                                 ]
                             },
@@ -370,10 +370,40 @@
                                     {
                                         "name": "IPs",
                                         "type": "string",
-                                        "value": "@{substring(variables('IPKomma'),0,sub(length(variables('IPKomma')),2))}"
+                                        "value": ""
                                     }
                                 ]
                             }
+                        },
+                        "Condition": {
+                            "actions": {
+                                "Set_variable": {
+                                    "inputs": {
+                                        "name": "IPs",
+                                        "value": "@{substring(variables('IPKomma'),0,sub(length(variables('IPKomma')),2))}"
+                                    },
+                                    "runAfter": {},
+                                    "type": "SetVariable"
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "not": {
+                                            "equals": [
+                                                "@length(variables('IPKomma'))",
+                                                0
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "runAfter": {
+                                "Initialize_variable_-_IPs": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "If"
                         },
                         "Initialize_variable_-_IPs_met_komma": {
                             "runAfter": {
