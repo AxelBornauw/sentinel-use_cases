@@ -37,7 +37,7 @@
         "linked-template-two": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-Teams/azuredeploy.json",
         "linked-template-three": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-CustomTeams/azuredeploy.json",
         "linked-template-four": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-BlockUser/azuredeploy.json",
-        "linked-template-five": ""
+        "linked-template-five": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-InvestigateEntityazuredeploy.json"
     },
     "resources": [
         {
@@ -164,6 +164,26 @@
                     }
                 }
             }
-        }        
+        },
+        {
+            "name": "investigate",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments','block')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linked-template-five')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "PlaybookName": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity)]"
+                    }
+                }
+            }
+        }
     ]
 }
