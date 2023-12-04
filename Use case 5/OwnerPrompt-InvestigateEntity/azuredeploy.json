@@ -8,7 +8,7 @@
         }
     },
     "variables": {
-        "AbuseipdbapiConnectionName": "AbuseIPDBAPI",
+        "AbuseipdbapiConnectionName": "abuseipdb-connection-AbuseIPDB-EnrichIncidentByIPInfo",
         "SentineltriageassistantConnectionName": "SentinelTriageAssistant",
         "AzureadConnectionName": "[concat('Azuread-', parameters('PlaybookName'))]",
         "AzuremonitorlogsConnectionName": "[concat('Azuremonitorlogs-', parameters('PlaybookName'))]",
