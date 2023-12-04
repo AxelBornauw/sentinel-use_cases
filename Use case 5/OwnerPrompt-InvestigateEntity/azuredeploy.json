@@ -48,7 +48,7 @@
                     "actions": {
                         "Base_Module": {
                             "runAfter": {
-                                "For_each_12": [
+                                "Switch_2": [
                                     "Succeeded"
                                 ]
                             },
@@ -1494,34 +1494,6 @@
                                 "path": "/entities/ip"
                             }
                         },
-                        "For_each_12": {
-                            "foreach": "@variables('ipsarray')",
-                            "actions": {
-                                "Append_to_array_variable_-_statentities": {
-                                    "runAfter": {},
-                                    "type": "AppendToArrayVariable",
-                                    "inputs": {
-                                        "name": "statentities",
-                                        "value": {
-                                            "id": "x",
-                                            "kind": "Ip",
-                                            "name": "x",
-                                            "properties": {
-                                                "address": "@{items('For_each_12')}",
-                                                "friendlyName": "@{items('For_each_12')}"
-                                            },
-                                            "type": "Microsoft.SecurityInsights/Entities"
-                                        }
-                                    }
-                                }
-                            },
-                            "runAfter": {
-                                "Initialize_variable_-_statentities": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Foreach"
-                        },
                         "Initialize_variable_-_MailEnIdEnName": {
                             "runAfter": {
                                 "Initialize_variable_-_accountsarray": [
@@ -1727,22 +1699,6 @@
                                         "name": "resultsarray",
                                         "type": "array",
                                         "value": []
-                                    }
-                                ]
-                            }
-                        },
-                        "Initialize_variable_-_statentities": {
-                            "runAfter": {
-                                "Switch_2": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "statentities",
-                                        "type": "array"
                                     }
                                 ]
                             }
@@ -2282,7 +2238,7 @@
                             "AbuseIPDBAPI": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AbuseipdbapiConnectionName'))]",
                                 "connectionName": "[variables('AbuseipdbapiConnectionName')]",
-                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/customApis/', variables('AbuseipdbapiConnectionName'))]"
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/customApis/AbuseIPDBAPI')]"
                             },
                             "SentinelTriageAssistant": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
