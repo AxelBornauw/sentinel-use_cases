@@ -124,6 +124,9 @@
                     "PlaybookName": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-CustomTeams')]"
                     },
+                    "Storage account name": {
+                        "value": "[parameters('Storage account name')]"
+                    },
                     "Storage account blob container name": {
                         "value": "[parameters('Storage account blob container name')]"
                     },

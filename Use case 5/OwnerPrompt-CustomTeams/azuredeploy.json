@@ -5,6 +5,9 @@
         "PlaybookName": {
             "type": "string"
         },
+        "Storage account name": {
+            "type": "String"
+        },
         "Storage account blob container name": {
             "type": "String"
         },
@@ -33,6 +36,10 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
+                        },
+                        "Storage account name": {
+                            "defaultValue": "[parameters('Storage account name')]",
+                            "type": "String"
                         },
                         "Storage account blob container name": {
                             "defaultValue": "[parameters('Storage account blob container name')]",
@@ -331,7 +338,7 @@
                                     }
                                 },
                                 "method": "delete",
-                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files/@{encodeURIComponent(encodeURIComponent('/',parameters('Storage account blob container name'),'/',variables('Blob')))}"
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent(parameters('Storage account name')))}/files/@{encodeURIComponent(encodeURIComponent('/',parameters('Storage account blob container name'),'/',variables('Blob')))}"
                             }
                         },
                         "Get_blob_content_using_path_(V2)": {
@@ -348,7 +355,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/GetFileContentByPath",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent(parameters('Storage account name')))}/files",
                                 "queries": {
                                     "inferContentType": false,
                                     "path": "/@{parameters('Storage account blob container name')}/@{variables('Blob')}",
@@ -1117,7 +1124,7 @@
                                                 }
                                             },
                                             "method": "delete",
-                                            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('AccountNameFromSettings'))}/files/@{encodeURIComponent(encodeURIComponent('/',parameters('Storage account blob container name'),'/',variables('Blob')))}"
+                                            "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent(parameters('Storage account name')))}/files/@{encodeURIComponent(encodeURIComponent('/',parameters('Storage account blob container name'),'/',variables('Blob')))}"
                                         }
                                     },
                                     "For_each": {
@@ -1224,6 +1231,10 @@
             "properties": {
                 "displayName": "[variables('AzureblobConnectionName')]",
                 "customParameterValues": {},
+                "parameterValueSet": {
+                    "name": "managedIdentityAuth",
+                    "values": {}
+                },
                 "api": {
                     "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureblob')]"
                 }

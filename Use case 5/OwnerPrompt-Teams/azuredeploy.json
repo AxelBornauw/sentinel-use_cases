@@ -225,11 +225,11 @@
                                 },
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azureblob_1']['connectionId']"
+                                        "name": "@parameters('$connections')['azureblob']['connectionId']"
                                     }
                                 },
                                 "method": "post",
-                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent(@parameters('Storage account name')))}/files",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent(parameters('Storage account name')))}/files",
                                 "queries": {
                                     "folderPath": "/@{parameters('Storage account blob container name')}",
                                     "name": "@variables('Blob')",
@@ -651,7 +651,7 @@
                                 "connectionName": "[variables('AzureadConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
                             },
-                            "azureblob_1": {
+                            "azureblob": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureblobConnectionName'))]",
                                 "connectionName": "[variables('AzureblobConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azureblob')]",
