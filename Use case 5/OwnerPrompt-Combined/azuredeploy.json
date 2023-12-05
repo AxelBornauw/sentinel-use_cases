@@ -181,6 +181,15 @@
                 "parameters": {
                     "PlaybookName": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity)]"
+                    },
+                    "PlaybookNameTeams": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-Teams')]"
+                    },
+                    "tenant": {
+                        "value": "[parameters('tenant')]"
+                    },
+                    "PlaybookNameBlockUser": {
+                        "value": "[parameters('PlaybookName_OwnerPrompt-BlockUser')]"
                     }
                 }
             }
