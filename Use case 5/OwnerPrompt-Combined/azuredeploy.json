@@ -25,6 +25,9 @@
         "Storage account blob container name": {
             "type": "string"
         },
+        "Storage account name": {
+            "type": "string"
+        },
         "Tenant": {
             "type": "string"
         },
@@ -37,7 +40,7 @@
         "linked-template-two": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-Teams/azuredeploy.json",
         "linked-template-three": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-CustomTeams/azuredeploy.json",
         "linked-template-four": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-BlockUser/azuredeploy.json",
-        "linked-template-five": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-InvestigateEntityazuredeploy.json"
+        "linked-template-five": "https://raw.githubusercontent.com/AxelBornauw/sentinel-use_cases/main/Use%20case%205/OwnerPrompt-InvestigateEntity/azuredeploy.json"
     },
     "resources": [
         {
@@ -88,6 +91,9 @@
                     },
                     "Storage account blob container name": {
                         "value": "[parameters('Storage account blob container name')]"
+                    },
+                    "Storage account name": {
+                        "value": "[parameters('Storage account name')]"
                     },
                     "PlaybookNameCustomTeams": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-CustomTeams')]"
@@ -180,7 +186,7 @@
                 },
                 "parameters": {
                     "PlaybookName": {
-                        "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity)]"
+                        "value": "[parameters('PlaybookName_OwnerPrompt-InvestigateEntity')]"
                     },
                     "PlaybookNameTeams": {
                         "value": "[parameters('PlaybookName_OwnerPrompt-Teams')]"
