@@ -22,10 +22,10 @@
             "defaultValue": "OwnerPrompt-InvestigateEntity",
             "type": "string"
         },
-        "Storage account blob container name": {
+        "Storage account name": {
             "type": "string"
         },
-        "Storage account name": {
+        "Storage account blob container name": {
             "type": "string"
         },
         "Tenant": {
