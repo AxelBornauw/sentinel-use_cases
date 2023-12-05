@@ -5,6 +5,15 @@
         "PlaybookName": {
             "defaultValue": "OwnerPrompt-InvestigateEntity",
             "type": "string"
+        },
+        "PlaybookNameBlockUser": {
+            "type": "String"
+        },
+        "PlaybookNameTeams": {
+            "type": "String"
+        },
+        "tenant": {
+            "type": "String"
         }
     },
     "variables": {
@@ -27,7 +36,19 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
-                        }
+                        },
+                        "TeamsBericht":  {
+                            "defaultValue":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameTeams'))]",
+                            "type":  "String"
+                        },
+                        "tenant":  {
+                            "defaultValue":  "[parameters('tenant')]",
+                            "type":  "String"
+                        },
+                        "BlockUser":  {
+                            "defaultValue":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBlockUser'))]",
+                            "type":  "String"
+                        }                      
                     },
                     "triggers": {
                         "Microsoft_Sentinel_incident": {
@@ -151,7 +172,7 @@
                                                     "type": "AppendToStringVariable",
                                                     "inputs": {
                                                         "name": "logins",
-                                                        "value": "<span style=\\\"font-size: 16px\\\"><strong>@{items('For_each_8')?['username']}:</strong></span>\n@{outputs('Compose_6')}\n"
+                                                        "value": "<span style=\\\"font-size: 16px\\\"><strong>@{items('For_each_8')?['username']}:</strong></span>\n@{outputs('Compose_6')}<br>"
                                                     }
                                                 },
                                                 "Compose_6": {
@@ -347,7 +368,7 @@
                                                 "and": [
                                                     {
                                                         "equals": [
-                                                            "@body('Related_Alerts_Module')?['DetailedResults']",
+                                                            "@empty(body('Related_Alerts_Module')?['DetailedResults'])",
                                                             true
                                                         ]
                                                     }
@@ -1232,7 +1253,7 @@
                                                 "and": [
                                                     {
                                                         "equals": [
-                                                            "@body('Related_Alerts_Module_2')?['DetailedResults']",
+                                                            "@empty(body('Related_Alerts_Module_2')?['DetailedResults'])",
                                                             true
                                                         ]
                                                     }
@@ -1279,7 +1300,7 @@
                                                     "BaseModuleBody": "@{body('Base_Module')}",
                                                     "CheckAccounts": false,
                                                     "CheckHosts": false,
-                                                    "LookbackInDays": 14
+                                                    "LookbackInDays": 7
                                                 },
                                                 "host": {
                                                     "connection": {
@@ -2227,6 +2248,167 @@
                                 }
                             },
                             "expression": "@variables('entity')",
+                            "type": "Switch"
+                        },
+                        "Compose_11": {
+                            "inputs": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "actions": [
+                                    {
+                                        "data": {
+                                            "x": "teams"
+                                        },
+                                        "iconUrl": "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/teams/icon.png",
+                                        "title": "Stuur Teams bericht",
+                                        "type": "Action.Submit"
+                                    },
+                                    {
+                                        "data": {
+                                            "x": "block"
+                                        },
+                                        "iconUrl": "https://cdn.pixabay.com/photo/2015/08/27/10/26/no-entry-909933_1280.png",
+                                        "title": "Gebruiker blokkeren",
+                                        "type": "Action.Submit"
+                                    },
+                                    {
+                                        "data": {
+                                            "x": "cancel"
+                                        },
+                                        "iconUrl": "https://cdn.pixabay.com/photo/2013/07/12/12/40/abort-146096_1280.png",
+                                        "title": "Beeindig sessie",
+                                        "type": "Action.Submit"
+                                    }
+                                ],
+                                "body": [
+                                    {
+                                        "horizontalAlignment": "Center",
+                                        "size": "Large",
+                                        "text": "Entities onderzocht.",
+                                        "type": "TextBlock",
+                                        "weight": "Bolder",
+                                        "wrap": true
+                                    },
+                                    {
+                                        "horizontalAlignment": "Center",
+                                        "size": "Medium",
+                                        "text": "Wat wenst u verder te doen?",
+                                        "type": "TextBlock",
+                                        "wrap": true
+                                    }
+                                ],
+                                "type": "AdaptiveCard",
+                                "version": "1.3"
+                            },
+                            "runAfter": {
+                                "Condition_-_account-beiden": [
+                                    "Succeeded"
+                                ],
+                                "Condition_-_ip-beiden": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Compose"
+                        },
+                        "Post_adaptive_card_and_wait_for_a_response_5": {
+                            "inputs": {
+                                "body": {
+                                    "body": {
+                                        "messageBody": "@{outputs('Compose_11')}",
+                                        "recipient": {
+                                            "to": "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                                        },
+                                        "updateMessage": "Thanks for your response!"
+                                    },
+                                    "notificationUrl": "@{listCallbackUrl()}"
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['teams']['connectionId']"
+                                    }
+                                },
+                                "path": "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                            },
+                            "runAfter": {
+                                "Compose_11": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnectionWebhook"
+                        },
+                        "Switch_3": {
+                            "cases": {
+                                "Case_-_block": {
+                                    "actions": {
+                                        "Run_Playbook_Module_2": {
+                                            "inputs": {
+                                                "body": {
+                                                    "AddIncidentComments": false,
+                                                    "BaseModuleBody": "@{body('Base_Module')}",
+                                                    "LogicAppResourceId": "@parameters('BlockUser')",
+                                                    "PlaybookName": "BlockUser",
+                                                    "TenantId": "@parameters('tenant')"
+                                                },
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "post",
+                                                "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
+                                                "queries": {
+                                                    "api-version": "2016-10-01",
+                                                    "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                    "sp": "/triggers/manual/run",
+                                                    "sv": "1.0"
+                                                }
+                                            },
+                                            "runAfter": {},
+                                            "type": "ApiConnection"
+                                        }
+                                    },
+                                    "case": "block"
+                                },
+                                "Case_-_teamsbericht": {
+                                    "actions": {
+                                        "Run_Playbook_Module": {
+                                            "inputs": {
+                                                "body": {
+                                                    "AddIncidentComments": false,
+                                                    "BaseModuleBody": "@{body('Base_Module')}",
+                                                    "LogicAppResourceId": "@parameters('TeamsBericht')",
+                                                    "PlaybookName": "TeamsBericht",
+                                                    "TenantId": "@parameters('tenant')"
+                                                },
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                                    }
+                                                },
+                                                "method": "post",
+                                                "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
+                                                "queries": {
+                                                    "api-version": "2016-10-01",
+                                                    "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                    "sp": "/triggers/manual/run",
+                                                    "sv": "1.0"
+                                                }
+                                            },
+                                            "runAfter": {},
+                                            "type": "ApiConnection"
+                                        }
+                                    },
+                                    "case": "teams"
+                                }
+                            },
+                            "default": {
+                                "actions": {}
+                            },
+                            "expression": "@body('Post_adaptive_card_and_wait_for_a_response_5')?['data']?['x']",
+                            "runAfter": {
+                                "Post_adaptive_card_and_wait_for_a_response_5": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "Switch"
                         }
                     },
