@@ -61,7 +61,7 @@
                             "type": "String"
                         },
                         "ResetPassword keyvault secret name": {
-                            "defaultValue": "[parameters('ResetPassword keyvault secret name')",
+                            "defaultValue": "parameters('ResetPassword keyvault secret name')",
                             "type": "String"
                         },
                         "TeamsBericht": {
@@ -1061,12 +1061,12 @@
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"
                                     }
-                                },
-                                "teams": {
-                                    "connectionId": "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
-                                    "connectionName": "[variables('TeamsConnectionName')]",
-                                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
                                 }
+                            },
+                            "teams": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
+                                "connectionName": "[variables('TeamsConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
                             }
                         }
                     }

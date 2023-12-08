@@ -562,7 +562,7 @@
                             "inputs": {
                                 "body": {
                                     "isAlert": false,
-                                    "messageBody": "\u003cp\u003e\u003cspan style=\"font-size: 16px\"\u003eBericht verstuurd\u003c/span\u003e\u003cbr\u003e\nTitel: \u003cstrong\u003e\u003c/strong\u003e\u003cstrong\u003e@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['titel']}\u003c/strong\u003e\u003cstrong\u003e\u003c/strong\u003e\u003cbr\u003e\nBericht:\u003cbr\u003e\n@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['tekst']}\u003c/p\u003e",
+                                    "messageBody": "<p><span style=\"font-size: 16px\">Bericht verstuurd</span><br>\nTitel: <strong></strong><strong>@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['titel']}</strong><strong></strong><br>\nBericht:<br>\n@{body('Post_adaptive_card_and_wait_for_a_response')?['data']?['tekst']}</p>",
                                     "recipient": "@triggerBody()?['object']?['properties']?['owner']?['email']"
                                 },
                                 "host": {
