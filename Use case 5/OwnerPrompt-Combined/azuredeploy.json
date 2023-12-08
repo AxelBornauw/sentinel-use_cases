@@ -34,6 +34,9 @@
         "ResetPassword Client ID": {
             "type": "string"
         },
+        "ResetPassword keyvault name": {
+            "type": "string"
+        },
         "ResetPassword keyvault secret name": {
             "type": "string"
         }
@@ -173,6 +176,9 @@
                     },
                     "ResetPassword Client ID": {
                         "value": "[parameters('ResetPassword Client ID')]"
+                    },
+                    "ResetPassword keyvault name": {
+                        "value": "[parameters('ResetPassword keyvault name')]"
                     },
                     "ResetPassword keyvault secret name": {
                         "value": "[parameters('ResetPassword keyvault secret name')]"

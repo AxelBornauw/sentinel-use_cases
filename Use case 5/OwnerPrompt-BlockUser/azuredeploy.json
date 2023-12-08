@@ -1,1100 +1,1088 @@
 {
-    "$schema":  "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion":  "1.0.0.0",
-    "parameters":  {
-        "PlaybookName":  {
-            "defaultValue":  "OwnerPrompt-BlockUser",
-            "type":  "string"
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "PlaybookName": {
+            "defaultValue": "OwnerPrompt-BlockUser",
+            "type": "string"
         },
-        "PlaybookNameBase":  {
-            "type":  "String"
+        "PlaybookNameBase": {
+            "type": "String"
         },
-        "PlaybookNameInvestigateEntity":  {
-            "type":  "String"
+        "PlaybookNameTeams": {
+            "type": "String"
         },
-        "ResetPassword Client ID":  {
-            "type":  "String"
+        "PlaybookNameInvestigateEntity": {
+            "type": "String"
+        },
+        "ResetPassword Client ID": {
+            "type": "String"
+        },
+        "ResetPassword keyvault name": {
+            "type": "String"
         },
         "ResetPassword keyvault secret name": {
             "type": "String"
         },
-        "PlaybookNameTeams":  {
-            "type":  "String"
-        },
-        "tenant":  {
-            "type":  "String"
+        "tenant": {
+            "type": "String"
         }
     },
-    "variables":  {
-        "SentineltriageassistantConnectionName":  "SentinelTriageAssistant",
-        "AzureadConnectionName":  "[concat('Azuread-', parameters('PlaybookName'))]",
-        "MicrosoftSentinelConnectionName":  "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
-        "KeyvaultConnectionName":  "[concat('Keyvault-', parameters('PlaybookName'))]",
-        "TeamsConnectionName":  "[concat('Teams-', parameters('PlaybookName'))]"
+    "variables": {
+        "SentineltriageassistantConnectionName": "SentinelTriageAssistant",
+        "AzureadConnectionName": "[concat('Azuread-', parameters('PlaybookName'))]",
+        "MicrosoftSentinelConnectionName": "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
+        "KeyvaultConnectionName": "[concat('Keyvault-', parameters('PlaybookName'))]",
+        "TeamsConnectionName": "[concat('Teams-', parameters('PlaybookName'))]"
     },
-    "resources":  [
+    "resources": [
         {
-            "properties":  {
-                "provisioningState":  "Succeeded",
-                "state":  "Enabled",
-                "definition":  {
-                    "$schema":  "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion":  "1.0.0.0",
-                    "parameters":  {
-                        "$connections":  {
-                            "defaultValue":  {},
-                            "type":  "Object"
+            "properties": {
+                "provisioningState": "Succeeded",
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
                         },
-                        "Base":  {
-                            "defaultValue":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBase'))]",
-                            "type":  "String"
+                        "Base": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameBase'))]",
+                            "type": "String"
                         },
-                        "InvestigateEntity":  {
-                            "defaultValue":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigateEntity'))]",
-                            "type":  "String"
+                        "InvestigateEntity": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameInvestigateEntity'))]",
+                            "type": "String"
                         },
-                        "ResetPassword Client ID":  {
-                            "defaultValue":  "[parameters('ResetPassword Client ID')]",
-                            "type":  "String"
+                        "ResetPassword Client ID": {
+                            "defaultValue": "[parameters('ResetPassword Client ID')]",
+                            "type": "String"
                         },
                         "ResetPassword keyvault secret name": {
                             "defaultValue": "[parameters('ResetPassword keyvault secret name')",
                             "type": "String"
                         },
-                        "TeamsBericht":  {
-                            "defaultValue":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameTeams'))]",
-                            "type":  "String"
+                        "TeamsBericht": {
+                            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameTeams'))]",
+                            "type": "String"
                         },
-                        "tenant":  {
-                            "defaultValue":  "[parameters('tenant')]",
-                            "type":  "String"
+                        "tenant": {
+                            "defaultValue": "[parameters('tenant')]",
+                            "type": "String"
                         }
                     },
-                    "triggers":  {
-                        "Microsoft_Sentinel_incident":  {
-                            "type":  "ApiConnectionWebhook",
-                            "inputs":  {
-                                "body":  {
-                                    "callback_url":  "@{listCallbackUrl()}"
+                    "triggers": {
+                        "Microsoft_Sentinel_incident": {
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "body": {
+                                    "callback_url": "@{listCallbackUrl()}"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
-                                "path":  "/incident-creation"
+                                "path": "/incident-creation"
                             }
                         }
                     },
-                    "actions":  {
-                        "Base_Module":  {
-                            "runAfter":  {
-                            },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  {
-                                    "AddAccountComments":  false,
-                                    "AddIPComments":  false,
-                                    "EnrichIPsWithGeoData":  false,
-                                    "Entities":  "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                    "IncidentARMId":  "@triggerBody()?['object']?['id']",
-                                    "WorkspaceId":  "@triggerBody()?['workspaceId']"
+                    "actions": {
+                        "Base_Module": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "AddAccountComments": false,
+                                    "AddIPComments": false,
+                                    "EnrichIPsWithGeoData": false,
+                                    "Entities": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                    "IncidentARMId": "@triggerBody()?['object']?['id']",
+                                    "WorkspaceId": "@triggerBody()?['workspaceId']"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                     }
                                 },
-                                "method":  "post",
-                                "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/base",
-                                "queries":  {
-                                    "api-version":  "2016-10-01",
-                                    "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                    "sp":  "/triggers/manual/run",
-                                    "sv":  "1.0"
+                                "method": "post",
+                                "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/base",
+                                "queries": {
+                                    "api-version": "2016-10-01",
+                                    "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                    "sp": "/triggers/manual/run",
+                                    "sv": "1.0"
                                 }
                             }
                         },
-                        "Compose":  {
-                            "runAfter":  {
-                                "Initialize_variable_-_Users":  [
+                        "Compose": {
+                            "runAfter": {
+                                "Initialize_variable_-_Users": [
                                     "Succeeded"
                                 ],
-                                "Parse_JSON":  [
+                                "Parse_JSON": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "Compose",
-                            "inputs":  {
-                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
-                                "actions":  [
+                            "type": "Compose",
+                            "inputs": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "actions": [
                                     {
-                                        "card":  {
-                                            "actions":  [
+                                        "card": {
+                                            "actions": [
                                                 {
-                                                    "data":  {
-                                                        "neat":  "true"
+                                                    "data": {
+                                                        "neat": "true"
                                                     },
-                                                    "title":  "Ja ik ben heel zeker.",
-                                                    "type":  "Action.Submit"
+                                                    "title": "Ja ik ben heel zeker.",
+                                                    "type": "Action.Submit"
                                                 }
                                             ],
-                                            "body":  [
+                                            "body": [
                                                 {
-                                                    "text":  "Ben je zeker dat je hiermee wilt verdergaan?",
-                                                    "type":  "TextBlock"
+                                                    "text": "Ben je zeker dat je hiermee wilt verdergaan?",
+                                                    "type": "TextBlock"
                                                 }
                                             ],
-                                            "type":  "AdaptiveCard"
+                                            "type": "AdaptiveCard"
                                         },
-                                        "title":  "Submit response!",
-                                        "type":  "Action.ShowCard"
+                                        "title": "Submit response!",
+                                        "type": "Action.ShowCard"
                                     }
                                 ],
-                                "body":  [
+                                "body": [
                                     {
-                                        "size":  "Small",
-                                        "style":  "Person",
-                                        "type":  "Image",
-                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                        "size": "Small",
+                                        "style": "Person",
+                                        "type": "Image",
+                                        "url": "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
                                     },
                                     {
-                                        "size":  "Large",
-                                        "text":  "Gebruiker(s) blokkeren:",
-                                        "type":  "TextBlock",
-                                        "wrap":  true
+                                        "size": "Large",
+                                        "text": "Gebruiker(s) blokkeren:",
+                                        "type": "TextBlock",
+                                        "wrap": true
                                     },
                                     {
-                                        "text":  "[[Bekijk hier het incident]](@{triggerBody()?['object']?['properties']?['incidentUrl']})",
-                                        "type":  "TextBlock",
-                                        "wrap":  true
+                                        "text": "[[Bekijk hier het incident]](@{triggerBody()?['object']?['properties']?['incidentUrl']})",
+                                        "type": "TextBlock",
+                                        "wrap": true
                                     },
                                     {
-                                        "choices":  [
+                                        "choices": [
                                             "@variables('Users')"
                                         ],
-                                        "errorMessage":  "Kies minstens 1 gebruiker",
-                                        "id":  "entities",
-                                        "isMultiSelect":  true,
-                                        "isRequired":  true,
-                                        "label":  "Kies 1 of meerdere gebruikers om te blokkeren.",
-                                        "type":  "Input.ChoiceSet"
+                                        "errorMessage": "Kies minstens 1 gebruiker",
+                                        "id": "entities",
+                                        "isMultiSelect": true,
+                                        "isRequired": true,
+                                        "label": "Kies 1 of meerdere gebruikers om te blokkeren.",
+                                        "type": "Input.ChoiceSet"
                                     },
                                     {
-                                        "choices":  [
+                                        "choices": [
                                             {
-                                                "title":  "Geen (keer terug)",
-                                                "value":  "geen"
+                                                "title": "Geen (keer terug)",
+                                                "value": "geen"
                                             },
                                             {
-                                                "title":  "Gebruiker disablen",
-                                                "value":  "disable"
+                                                "title": "Gebruiker disablen",
+                                                "value": "disable"
                                             },
                                             {
-                                                "title":  "Wachtwoord resetten",
-                                                "value":  "reset"
+                                                "title": "Wachtwoord resetten",
+                                                "value": "reset"
                                             },
                                             {
-                                                "title":  "Sessietokens revoken",
-                                                "value":  "revoke"
+                                                "title": "Sessietokens revoken",
+                                                "value": "revoke"
                                             }
                                         ],
-                                        "errorMessage":  "Kies minstens 1 actie!",
-                                        "id":  "acties",
-                                        "isMultiSelect":  true,
-                                        "isRequired":  true,
-                                        "label":  "Kies 1 of meerdere acties om te ondernemen.",
-                                        "separator":  true,
-                                        "style":  "expanded",
-                                        "type":  "Input.ChoiceSet"
+                                        "errorMessage": "Kies minstens 1 actie!",
+                                        "id": "acties",
+                                        "isMultiSelect": true,
+                                        "isRequired": true,
+                                        "label": "Kies 1 of meerdere acties om te ondernemen.",
+                                        "separator": true,
+                                        "style": "expanded",
+                                        "type": "Input.ChoiceSet"
                                     }
                                 ],
-                                "type":  "AdaptiveCard",
-                                "version":  "1.3"
+                                "type": "AdaptiveCard",
+                                "version": "1.3"
                             }
                         },
-                        "Compose_2":  {
-                            "runAfter":  {
-                                "Compose":  [
+                        "Compose_2": {
+                            "runAfter": {
+                                "Compose": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "Compose",
-                            "inputs":  "@replace(replace(replace(string(outputs('Compose')),'\"//BEGIN', ''), '//EINDE\"', ''), '\\\"', '\"')"
+                            "type": "Compose",
+                            "inputs": "@replace(replace(replace(string(outputs('Compose')),'\"//BEGIN', ''), '//EINDE\"', ''), '\\\"', '\"')"
                         },
-                        "Compose_3":  {
-                            "runAfter":  {
-                                "Condition_-_keer_terug":  [
+                        "Compose_3": {
+                            "runAfter": {
+                                "Condition_-_keer_terug": [
                                     "Succeeded",
                                     "Skipped"
                                 ],
-                                "Post_message_in_a_chat_or_channel":  [
+                                "Post_message_in_a_chat_or_channel": [
                                     "Succeeded",
                                     "Skipped"
                                 ],
-                                "Post_message_in_a_chat_or_channel_2":  [
+                                "Post_message_in_a_chat_or_channel_2": [
                                     "Succeeded",
                                     "Skipped"
                                 ],
-                                "Post_message_in_a_chat_or_channel_3":  [
+                                "Post_message_in_a_chat_or_channel_3": [
                                     "Succeeded",
                                     "Skipped"
                                 ]
                             },
-                            "type":  "Compose",
-                            "inputs":  {
-                                "$schema":  "http://adaptivecards.io/schemas/adaptive-card.json",
-                                "actions":  [
+                            "type": "Compose",
+                            "inputs": {
+                                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "actions": [
                                     {
-                                        "data":  {
-                                            "x":  "teams"
+                                        "data": {
+                                            "x": "teams"
                                         },
-                                        "iconUrl":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/teams/icon.png",
-                                        "title":  "Stuur Teams bericht",
-                                        "type":  "Action.Submit"
+                                        "iconUrl": "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/teams/icon.png",
+                                        "title": "Stuur Teams bericht",
+                                        "type": "Action.Submit"
                                     },
                                     {
-                                        "data":  {
-                                            "x":  "onderzoek"
+                                        "data": {
+                                            "x": "onderzoek"
                                         },
-                                        "iconUrl":  "https://cdn.pixabay.com/photo/2015/12/08/17/38/magnifying-glass-1083373_1280.png",
-                                        "title":  "Onderzoek verder",
-                                        "type":  "Action.Submit"
+                                        "iconUrl": "https://cdn.pixabay.com/photo/2015/12/08/17/38/magnifying-glass-1083373_1280.png",
+                                        "title": "Onderzoek verder",
+                                        "type": "Action.Submit"
                                     },
                                     {
-                                        "data":  {
-                                            "x":  "cancel"
+                                        "data": {
+                                            "x": "cancel"
                                         },
-                                        "iconUrl":  "https://cdn.pixabay.com/photo/2013/07/12/12/40/abort-146096_1280.png",
-                                        "title":  "Beeindig sessie",
-                                        "type":  "Action.Submit"
+                                        "iconUrl": "https://cdn.pixabay.com/photo/2013/07/12/12/40/abort-146096_1280.png",
+                                        "title": "Beeindig sessie",
+                                        "type": "Action.Submit"
                                     }
                                 ],
-                                "body":  [
+                                "body": [
                                     {
-                                        "size":  "Small",
-                                        "style":  "Person",
-                                        "type":  "Image",
-                                        "url":  "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
+                                        "size": "Small",
+                                        "style": "Person",
+                                        "type": "Image",
+                                        "url": "https://connectoricons-prod.azureedge.net/releases/v1.0.1391/1.0.1391.2130/azuresentinel/icon.png"
                                     },
                                     {
-                                        "size":  "Large",
-                                        "text":  "Actie(s) succesvol uitgevoerd.",
-                                        "type":  "TextBlock",
-                                        "wrap":  true
+                                        "size": "Large",
+                                        "text": "Actie(s) succesvol uitgevoerd.",
+                                        "type": "TextBlock",
+                                        "wrap": true
                                     },
                                     {
-                                        "text":  "Account geblokkeerd: **@{variables('AccountDisabled')}**",
-                                        "type":  "TextBlock",
-                                        "wrap":  true
+                                        "text": "Account geblokkeerd: **@{variables('AccountDisabled')}**",
+                                        "type": "TextBlock",
+                                        "wrap": true
                                     },
                                     {
-                                        "text":  "Sessietokens gerefresht: **@{variables('TokensRevoked')}**",
-                                        "type":  "TextBlock",
-                                        "wrap":  true
+                                        "text": "Sessietokens gerefresht: **@{variables('TokensRevoked')}**",
+                                        "type": "TextBlock",
+                                        "wrap": true
                                     },
                                     {
-                                        "text":  "Wachtwoord gereset: **@{variables('PasswordReset')}**",
-                                        "type":  "TextBlock",
-                                        "wrap":  true
+                                        "text": "Wachtwoord gereset: **@{variables('PasswordReset')}**",
+                                        "type": "TextBlock",
+                                        "wrap": true
                                     }
                                 ],
-                                "type":  "AdaptiveCard",
-                                "version":  "1.3"
+                                "type": "AdaptiveCard",
+                                "version": "1.3"
                             }
                         },
-                        "Condition_-_disable_user":  {
-                            "actions":  {
-                                "For_each_5":  {
-                                    "foreach":  "@variables('idsarray')",
-                                    "actions":  {
-                                        "Update_user":  {
-                                            "runAfter":  {
-                                            },
-                                            "type":  "ApiConnection",
-                                            "inputs":  {
-                                                "body":  {
-                                                    "accountEnabled":  false
+                        "Condition_-_disable_user": {
+                            "actions": {
+                                "For_each_5": {
+                                    "foreach": "@variables('idsarray')",
+                                    "actions": {
+                                        "Update_user": {
+                                            "runAfter": {},
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "body": {
+                                                    "accountEnabled": false
                                                 },
-                                                "host":  {
-                                                    "connection":  {
-                                                        "name":  "@parameters('$connections')['azuread']['connectionId']"
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azuread']['connectionId']"
                                                     }
                                                 },
-                                                "method":  "patch",
-                                                "path":  "/v1.0/users/@{encodeURIComponent(items('For_each_5'))}"
+                                                "method": "patch",
+                                                "path": "/v1.0/users/@{encodeURIComponent(items('For_each_5'))}"
                                             }
                                         }
                                     },
-                                    "runAfter":  {
-                                    },
-                                    "type":  "Foreach"
+                                    "runAfter": {},
+                                    "type": "Foreach"
                                 },
-                                "Set_variable_2":  {
-                                    "runAfter":  {
-                                        "For_each_5":  [
+                                "Set_variable_2": {
+                                    "runAfter": {
+                                        "For_each_5": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "SetVariable",
-                                    "inputs":  {
-                                        "name":  "AccountDisabled",
-                                        "value":  true
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "AccountDisabled",
+                                        "value": true
                                     }
                                 }
                             },
-                            "runAfter":  {
-                                "For_each_2":  [
+                            "runAfter": {
+                                "For_each_2": [
                                     "Succeeded"
                                 ]
                             },
-                            "expression":  {
-                                "and":  [
+                            "expression": {
+                                "and": [
                                     {
-                                        "contains":  [
+                                        "contains": [
                                             "@body('Post_adaptive_card_and_wait_for_a_response')?['data']?['acties']",
                                             "disable"
                                         ]
                                     }
                                 ]
                             },
-                            "type":  "If"
+                            "type": "If"
                         },
-                        "Condition_-_keer_terug":  {
-                            "actions":  {
-                                "Run_Playbook_Module":  {
-                                    "runAfter":  {
-                                    },
-                                    "type":  "ApiConnection",
-                                    "inputs":  {
-                                        "body":  {
-                                            "AddIncidentComments":  false,
-                                            "BaseModuleBody":  "@{body('Base_Module')}",
-                                            "LogicAppResourceId":  "@parameters('Base')",
-                                            "PlaybookName":  "Base module",
-                                            "TenantId":  "@parameters('tenant')"
+                        "Condition_-_keer_terug": {
+                            "actions": {
+                                "Run_Playbook_Module": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "body": {
+                                            "AddIncidentComments": false,
+                                            "BaseModuleBody": "@{body('Base_Module')}",
+                                            "LogicAppResourceId": "@parameters('Base')",
+                                            "PlaybookName": "Base module",
+                                            "TenantId": "@parameters('tenant')"
                                         },
-                                        "host":  {
-                                            "connection":  {
-                                                "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                             }
                                         },
-                                        "method":  "post",
-                                        "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
-                                        "queries":  {
-                                            "api-version":  "2016-10-01",
-                                            "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                            "sp":  "/triggers/manual/run",
-                                            "sv":  "1.0"
+                                        "method": "post",
+                                        "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
+                                        "queries": {
+                                            "api-version": "2016-10-01",
+                                            "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                            "sp": "/triggers/manual/run",
+                                            "sv": "1.0"
                                         }
                                     }
                                 },
-                                "Terminate":  {
-                                    "runAfter":  {
-                                        "Run_Playbook_Module":  [
+                                "Terminate": {
+                                    "runAfter": {
+                                        "Run_Playbook_Module": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "Terminate",
-                                    "inputs":  {
-                                        "runStatus":  "Succeeded"
+                                    "type": "Terminate",
+                                    "inputs": {
+                                        "runStatus": "Succeeded"
                                     }
                                 }
                             },
-                            "runAfter":  {
-                                "For_each_2":  [
+                            "runAfter": {
+                                "For_each_2": [
                                     "Succeeded"
                                 ]
                             },
-                            "expression":  {
-                                "and":  [
+                            "expression": {
+                                "and": [
                                     {
-                                        "contains":  [
+                                        "contains": [
                                             "@body('Post_adaptive_card_and_wait_for_a_response')?['data']?['acties']",
                                             "geen"
                                         ]
                                     }
                                 ]
                             },
-                            "type":  "If"
+                            "type": "If"
                         },
-                        "Condition_-_reset_wachtwoord":  {
-                            "actions":  {
-                                "For_each_6":  {
-                                    "foreach":  "@variables('idsarray')",
-                                    "actions":  {
-                                        "HTTP_2":  {
-                                            "runAfter":  {
-                                            },
-                                            "type":  "Http",
-                                            "inputs":  {
-                                                "body":  {
-                                                    "passwordProfile":  {
-                                                        "forceChangePasswordNextSignIn":  true
+                        "Condition_-_reset_wachtwoord": {
+                            "actions": {
+                                "For_each_6": {
+                                    "foreach": "@variables('idsarray')",
+                                    "actions": {
+                                        "HTTP_2": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                                "body": {
+                                                    "passwordProfile": {
+                                                        "forceChangePasswordNextSignIn": true
                                                     }
                                                 },
-                                                "headers":  {
-                                                    "Authorization":  "Bearer @{body('HTTP')?['access_token']}",
-                                                    "Content-Type":  "application/json"
+                                                "headers": {
+                                                    "Authorization": "Bearer @{body('HTTP')?['access_token']}",
+                                                    "Content-Type": "application/json"
                                                 },
-                                                "method":  "PATCH",
-                                                "uri":  "https://graph.microsoft.com/v1.0/users/@{items('For_each_6')}"
+                                                "method": "PATCH",
+                                                "uri": "https://graph.microsoft.com/v1.0/users/@{items('For_each_6')}"
                                             }
                                         }
                                     },
-                                    "runAfter":  {
-                                        "HTTP":  [
+                                    "runAfter": {
+                                        "HTTP": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "Foreach"
+                                    "type": "Foreach"
                                 },
-                                "Get_secret":  {
-                                    "runAfter":  {
-                                    },
-                                    "type":  "ApiConnection",
-                                    "inputs":  {
-                                        "host":  {
-                                            "connection":  {
-                                                "name":  "@parameters('$connections')['keyvault']['connectionId']"
+                                "Get_secret": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['keyvault']['connectionId']"
                                             }
                                         },
-                                        "method":  "get",
-                                        "path":  "/secrets/@{encodeURIComponent(parameters('ResetPassword keyvault secret name'))}/value"
+                                        "method": "get",
+                                        "path": "/secrets/@{encodeURIComponent(parameters('ResetPassword keyvault secret name'))}/value"
                                     }
                                 },
-                                "HTTP":  {
-                                    "runAfter":  {
-                                        "Get_secret":  [
+                                "HTTP": {
+                                    "runAfter": {
+                                        "Get_secret": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "Http",
-                                    "inputs":  {
-                                        "body":  "grant_type=client_credentials\u0026client_id=@{parameters('ResetPassword Client ID')}\u0026client_secret=@{body('Get_secret')?['value']}\u0026scope=https://graph.microsoft.com/.default",
-                                        "headers":  {
-                                            "Content-Type":  "application/x-www-form-urlencoded"
+                                    "type": "Http",
+                                    "inputs": {
+                                        "body": "grant_type=client_credentials&client_id=@{parameters('ResetPassword Client ID')}&client_secret=@{body('Get_secret')?['value']}&scope=https://graph.microsoft.com/.default",
+                                        "headers": {
+                                            "Content-Type": "application/x-www-form-urlencoded"
                                         },
-                                        "method":  "POST",
-                                        "uri":  "https://login.microsoftonline.com/@{parameters('tenant')}/oauth2/v2.0/token"
+                                        "method": "POST",
+                                        "uri": "https://login.microsoftonline.com/@{parameters('tenant')}/oauth2/v2.0/token"
                                     }
                                 },
-                                "Set_variable_3":  {
-                                    "runAfter":  {
-                                        "For_each_6":  [
+                                "Set_variable_3": {
+                                    "runAfter": {
+                                        "For_each_6": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "SetVariable",
-                                    "inputs":  {
-                                        "name":  "PasswordReset",
-                                        "value":  true
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "PasswordReset",
+                                        "value": true
                                     }
                                 }
                             },
-                            "runAfter":  {
-                                "For_each_2":  [
+                            "runAfter": {
+                                "For_each_2": [
                                     "Succeeded"
                                 ]
                             },
-                            "expression":  {
-                                "and":  [
+                            "expression": {
+                                "and": [
                                     {
-                                        "contains":  [
+                                        "contains": [
                                             "@body('Post_adaptive_card_and_wait_for_a_response')?['data']?['acties']",
                                             "reset"
                                         ]
                                     }
                                 ]
                             },
-                            "type":  "If"
+                            "type": "If"
                         },
-                        "Condition_-_revoke_sessions":  {
-                            "actions":  {
-                                "For_each_3":  {
-                                    "foreach":  "@variables('idsarray')",
-                                    "actions":  {
-                                        "Refresh_tokens":  {
-                                            "runAfter":  {
-                                            },
-                                            "type":  "ApiConnection",
-                                            "inputs":  {
-                                                "host":  {
-                                                    "connection":  {
-                                                        "name":  "@parameters('$connections')['azuread']['connectionId']"
+                        "Condition_-_revoke_sessions": {
+                            "actions": {
+                                "For_each_3": {
+                                    "foreach": "@variables('idsarray')",
+                                    "actions": {
+                                        "Refresh_tokens": {
+                                            "runAfter": {},
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['azuread']['connectionId']"
                                                     }
                                                 },
-                                                "method":  "post",
-                                                "path":  "/v1.0/users/@{encodeURIComponent(items('For_each_3'))}/revokeSignInSessions"
+                                                "method": "post",
+                                                "path": "/v1.0/users/@{encodeURIComponent(items('For_each_3'))}/revokeSignInSessions"
                                             }
                                         }
                                     },
-                                    "runAfter":  {
-                                    },
-                                    "type":  "Foreach"
+                                    "runAfter": {},
+                                    "type": "Foreach"
                                 },
-                                "Set_variable":  {
-                                    "runAfter":  {
-                                        "For_each_3":  [
+                                "Set_variable": {
+                                    "runAfter": {
+                                        "For_each_3": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "SetVariable",
-                                    "inputs":  {
-                                        "name":  "TokensRevoked",
-                                        "value":  true
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "TokensRevoked",
+                                        "value": true
                                     }
                                 }
                             },
-                            "runAfter":  {
-                                "For_each_2":  [
+                            "runAfter": {
+                                "For_each_2": [
                                     "Succeeded"
                                 ]
                             },
-                            "expression":  {
-                                "and":  [
+                            "expression": {
+                                "and": [
                                     {
-                                        "contains":  [
+                                        "contains": [
                                             "@body('Post_adaptive_card_and_wait_for_a_response')?['data']?['acties']",
                                             "revoke"
                                         ]
                                     }
                                 ]
                             },
-                            "type":  "If"
+                            "type": "If"
                         },
-                        "Entities_-_Get_Accounts":  {
-                            "runAfter":  {
-                                "Base_Module":  [
+                        "Entities_-_Get_Accounts": {
+                            "runAfter": {
+                                "Base_Module": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['azuresentinel']['connectionId']"
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
-                                "method":  "post",
-                                "path":  "/entities/account"
+                                "method": "post",
+                                "path": "/entities/account"
                             }
                         },
-                        "For_each":  {
-                            "foreach":  "@body('Entities_-_Get_Accounts')?['Accounts']",
-                            "actions":  {
-                                "Append_to_array_variable":  {
-                                    "runAfter":  {
-                                        "Append_to_string_variable":  [
+                        "For_each": {
+                            "foreach": "@body('Entities_-_Get_Accounts')?['Accounts']",
+                            "actions": {
+                                "Append_to_array_variable": {
+                                    "runAfter": {
+                                        "Append_to_string_variable": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "AppendToArrayVariable",
-                                    "inputs":  {
-                                        "name":  "MailEnID",
-                                        "value":  {
-                                            "userid":  "@{body('Get_user')?['id']}",
-                                            "usermail":  "@{body('Get_user')?['mail']}"
+                                    "type": "AppendToArrayVariable",
+                                    "inputs": {
+                                        "name": "MailEnID",
+                                        "value": {
+                                            "userid": "@{body('Get_user')?['id']}",
+                                            "usermail": "@{body('Get_user')?['mail']}"
                                         }
                                     }
                                 },
-                                "Append_to_string_variable":  {
-                                    "runAfter":  {
-                                        "Get_user":  [
+                                "Append_to_string_variable": {
+                                    "runAfter": {
+                                        "Get_user": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "AppendToStringVariable",
-                                    "inputs":  {
-                                        "name":  "UsersKomma",
-                                        "value":  "{\"title\": \"@{body('Get_user')?['displayName']}\",\"value\" :\"@{body('Get_user')?['mail']}\"},"
+                                    "type": "AppendToStringVariable",
+                                    "inputs": {
+                                        "name": "UsersKomma",
+                                        "value": "{\"title\": \"@{body('Get_user')?['displayName']}\",\"value\" :\"@{body('Get_user')?['mail']}\"},"
                                     }
                                 },
-                                "Get_user":  {
-                                    "runAfter":  {
-                                    },
-                                    "type":  "ApiConnection",
-                                    "inputs":  {
-                                        "host":  {
-                                            "connection":  {
-                                                "name":  "@parameters('$connections')['azuread']['connectionId']"
+                                "Get_user": {
+                                    "runAfter": {},
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuread']['connectionId']"
                                             }
                                         },
-                                        "method":  "get",
-                                        "path":  "/v1.0/users/@{encodeURIComponent(items('For_each')?['AadUserId'])}"
+                                        "method": "get",
+                                        "path": "/v1.0/users/@{encodeURIComponent(items('For_each')?['AadUserId'])}"
                                     }
                                 }
                             },
-                            "runAfter":  {
-                                "Entities_-_Get_Accounts":  [
+                            "runAfter": {
+                                "Entities_-_Get_Accounts": [
                                     "Succeeded"
                                 ],
-                                "Initialize_variable_-_MailEnID":  [
+                                "Initialize_variable_-_MailEnID": [
                                     "Succeeded"
                                 ],
-                                "Initialize_variable_-_PasswordReset":  [
+                                "Initialize_variable_-_PasswordReset": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "Foreach"
+                            "type": "Foreach"
                         },
-                        "For_each_2":  {
-                            "foreach":  "@variables('entitiesarray')",
-                            "actions":  {
-                                "Filter_array":  {
-                                    "runAfter":  {
-                                    },
-                                    "type":  "Query",
-                                    "inputs":  {
-                                        "from":  "@body('Parse_JSON')",
-                                        "where":  "@contains(item()['usermail'], items('For_each_2'))"
+                        "For_each_2": {
+                            "foreach": "@variables('entitiesarray')",
+                            "actions": {
+                                "Filter_array": {
+                                    "runAfter": {},
+                                    "type": "Query",
+                                    "inputs": {
+                                        "from": "@body('Parse_JSON')",
+                                        "where": "@contains(item()['usermail'], items('For_each_2'))"
                                     }
                                 },
-                                "For_each_4":  {
-                                    "foreach":  "@body('Filter_array')",
-                                    "actions":  {
-                                        "Append_to_array_variable_2":  {
-                                            "runAfter":  {
-                                            },
-                                            "type":  "AppendToArrayVariable",
-                                            "inputs":  {
-                                                "name":  "idsarray",
-                                                "value":  "@items('For_each_4')?['userid']"
+                                "For_each_4": {
+                                    "foreach": "@body('Filter_array')",
+                                    "actions": {
+                                        "Append_to_array_variable_2": {
+                                            "runAfter": {},
+                                            "type": "AppendToArrayVariable",
+                                            "inputs": {
+                                                "name": "idsarray",
+                                                "value": "@items('For_each_4')?['userid']"
                                             }
                                         }
                                     },
-                                    "runAfter":  {
-                                        "Filter_array":  [
+                                    "runAfter": {
+                                        "Filter_array": [
                                             "Succeeded"
                                         ]
                                     },
-                                    "type":  "Foreach"
+                                    "type": "Foreach"
                                 }
                             },
-                            "runAfter":  {
-                                "Initialize_variable_-_entitiesarray":  [
+                            "runAfter": {
+                                "Initialize_variable_-_entitiesarray": [
                                     "Succeeded"
                                 ],
-                                "Initialize_variable_-_idsarray":  [
+                                "Initialize_variable_-_idsarray": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "Foreach"
+                            "type": "Foreach"
                         },
-                        "Initialize_variable_-_AccountDisabled":  {
-                            "runAfter":  {
-                                "Base_Module":  [
+                        "Initialize_variable_-_AccountDisabled": {
+                            "runAfter": {
+                                "Base_Module": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "InitializeVariable",
-                            "inputs":  {
-                                "variables":  [
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
                                     {
-                                        "name":  "AccountDisabled",
-                                        "type":  "boolean",
-                                        "value":  false
+                                        "name": "AccountDisabled",
+                                        "type": "boolean",
+                                        "value": false
                                     }
                                 ]
                             }
                         },
-                        "Initialize_variable_-_MailEnID":  {
-                            "runAfter":  {
-                                "Initialize_variable_-_UsersKomma":  [
+                        "Initialize_variable_-_MailEnID": {
+                            "runAfter": {
+                                "Initialize_variable_-_UsersKomma": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "InitializeVariable",
-                            "inputs":  {
-                                "variables":  [
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
                                     {
-                                        "name":  "MailEnID",
-                                        "type":  "array"
+                                        "name": "MailEnID",
+                                        "type": "array"
                                     }
                                 ]
                             }
                         },
-                        "Initialize_variable_-_PasswordReset":  {
-                            "runAfter":  {
-                                "Initialize_variable_-_TokensRevoked":  [
+                        "Initialize_variable_-_PasswordReset": {
+                            "runAfter": {
+                                "Initialize_variable_-_TokensRevoked": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "InitializeVariable",
-                            "inputs":  {
-                                "variables":  [
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
                                     {
-                                        "name":  "PasswordReset",
-                                        "type":  "boolean",
-                                        "value":  false
+                                        "name": "PasswordReset",
+                                        "type": "boolean",
+                                        "value": false
                                     }
                                 ]
                             }
                         },
-                        "Initialize_variable_-_TokensRevoked":  {
-                            "runAfter":  {
-                                "Initialize_variable_-_AccountDisabled":  [
+                        "Initialize_variable_-_TokensRevoked": {
+                            "runAfter": {
+                                "Initialize_variable_-_AccountDisabled": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "InitializeVariable",
-                            "inputs":  {
-                                "variables":  [
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
                                     {
-                                        "name":  "TokensRevoked",
-                                        "type":  "boolean",
-                                        "value":  false
+                                        "name": "TokensRevoked",
+                                        "type": "boolean",
+                                        "value": false
                                     }
                                 ]
                             }
                         },
-                        "Initialize_variable_-_Users":  {
-                            "runAfter":  {
-                                "For_each":  [
+                        "Initialize_variable_-_Users": {
+                            "runAfter": {
+                                "For_each": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "InitializeVariable",
-                            "inputs":  {
-                                "variables":  [
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
                                     {
-                                        "name":  "Users",
-                                        "type":  "string",
-                                        "value":  "@{concat('//BEGIN', substring(variables('UsersKomma'),0,sub(length(variables('UsersKomma')),1)), '//EINDE')}"
+                                        "name": "Users",
+                                        "type": "string",
+                                        "value": "@{concat('//BEGIN', substring(variables('UsersKomma'),0,sub(length(variables('UsersKomma')),1)), '//EINDE')}"
                                     }
                                 ]
                             }
                         },
-                        "Initialize_variable_-_UsersKomma":  {
-                            "runAfter":  {
-                                "Base_Module":  [
+                        "Initialize_variable_-_UsersKomma": {
+                            "runAfter": {
+                                "Base_Module": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "InitializeVariable",
-                            "inputs":  {
-                                "variables":  [
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
                                     {
-                                        "name":  "UsersKomma",
-                                        "type":  "string"
+                                        "name": "UsersKomma",
+                                        "type": "string"
                                     }
                                 ]
                             }
                         },
-                        "Initialize_variable_-_entitiesarray":  {
-                            "runAfter":  {
-                                "Post_adaptive_card_and_wait_for_a_response":  [
+                        "Initialize_variable_-_entitiesarray": {
+                            "runAfter": {
+                                "Post_adaptive_card_and_wait_for_a_response": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "InitializeVariable",
-                            "inputs":  {
-                                "variables":  [
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
                                     {
-                                        "name":  "entitiesarray",
-                                        "type":  "array",
-                                        "value":  "@split(string(body('Post_adaptive_card_and_wait_for_a_response')?['data']?['entities']), ',')"
+                                        "name": "entitiesarray",
+                                        "type": "array",
+                                        "value": "@split(string(body('Post_adaptive_card_and_wait_for_a_response')?['data']?['entities']), ',')"
                                     }
                                 ]
                             }
                         },
-                        "Initialize_variable_-_idsarray":  {
-                            "runAfter":  {
-                                "Post_adaptive_card_and_wait_for_a_response":  [
+                        "Initialize_variable_-_idsarray": {
+                            "runAfter": {
+                                "Post_adaptive_card_and_wait_for_a_response": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "InitializeVariable",
-                            "inputs":  {
-                                "variables":  [
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
                                     {
-                                        "name":  "idsarray",
-                                        "type":  "array"
+                                        "name": "idsarray",
+                                        "type": "array"
                                     }
                                 ]
                             }
                         },
-                        "Parse_JSON":  {
-                            "runAfter":  {
-                                "For_each":  [
+                        "Parse_JSON": {
+                            "runAfter": {
+                                "For_each": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "ParseJson",
-                            "inputs":  {
-                                "content":  "@variables('MailEnID')",
-                                "schema":  {
-                                    "items":  {
-                                        "properties":  {
-                                            "userid":  {
-                                                "type":  "string"
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@variables('MailEnID')",
+                                "schema": {
+                                    "items": {
+                                        "properties": {
+                                            "userid": {
+                                                "type": "string"
                                             },
-                                            "usermail":  {
-                                                "type":  "string"
+                                            "usermail": {
+                                                "type": "string"
                                             }
                                         },
-                                        "required":  [
+                                        "required": [
                                             "userid",
                                             "usermail"
                                         ],
-                                        "type":  "object"
+                                        "type": "object"
                                     },
-                                    "type":  "array"
+                                    "type": "array"
                                 }
                             }
                         },
-                        "Post_adaptive_card_and_wait_for_a_response":  {
-                            "runAfter":  {
-                                "Compose_2":  [
+                        "Post_adaptive_card_and_wait_for_a_response": {
+                            "runAfter": {
+                                "Compose_2": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "ApiConnectionWebhook",
-                            "inputs":  {
-                                "body":  {
-                                    "body":  {
-                                        "messageBody":  "@{outputs('Compose_2')}",
-                                        "recipient":  {
-                                            "to":  "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "body": {
+                                    "body": {
+                                        "messageBody": "@{outputs('Compose_2')}",
+                                        "recipient": {
+                                            "to": "@triggerBody()?['object']?['properties']?['owner']?['email']"
                                         },
-                                        "updateMessage":  "Thanks for your response!"
+                                        "updateMessage": "Thanks for your response!"
                                     },
-                                    "notificationUrl":  "@{listCallbackUrl()}"
+                                    "notificationUrl": "@{listCallbackUrl()}"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['teams']['connectionId']"
                                     }
                                 },
-                                "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                                "path": "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
                             }
                         },
-                        "Post_adaptive_card_and_wait_for_a_response_2":  {
-                            "runAfter":  {
-                                "Compose_3":  [
+                        "Post_adaptive_card_and_wait_for_a_response_2": {
+                            "runAfter": {
+                                "Compose_3": [
                                     "Succeeded"
                                 ]
                             },
-                            "type":  "ApiConnectionWebhook",
-                            "inputs":  {
-                                "body":  {
-                                    "body":  {
-                                        "messageBody":  "@{outputs('Compose_3')}",
-                                        "recipient":  {
-                                            "to":  "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "body": {
+                                    "body": {
+                                        "messageBody": "@{outputs('Compose_3')}",
+                                        "recipient": {
+                                            "to": "@triggerBody()?['object']?['properties']?['owner']?['email']"
                                         },
-                                        "updateMessage":  "Thanks for your response!"
+                                        "updateMessage": "Thanks for your response!"
                                     },
-                                    "notificationUrl":  "@{listCallbackUrl()}"
+                                    "notificationUrl": "@{listCallbackUrl()}"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['teams']['connectionId']"
                                     }
                                 },
-                                "path":  "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
+                                "path": "/v1.0/teams/conversation/gatherinput/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}/$subscriptions"
                             }
                         },
-                        "Post_message_in_a_chat_or_channel":  {
-                            "runAfter":  {
-                                "Condition_-_disable_user":  [
+                        "Post_message_in_a_chat_or_channel": {
+                            "runAfter": {
+                                "Condition_-_disable_user": [
                                     "Failed"
                                 ]
                             },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  {
-                                    "messageBody":  "\u003cp\u003e\u003cspan style=\"font-size: 16px\"\u003e\u003cstrong\u003eActie gefaald: User disablen\u003c/strong\u003e\u003c/span\u003e\u003c/p\u003e",
-                                    "recipient":  "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "messageBody": "<p><span style=\"font-size: 16px\"><strong>Actie gefaald: User disablen</strong></span></p>",
+                                    "recipient": "@triggerBody()?['object']?['properties']?['owner']?['email']"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['teams']['connectionId']"
                                     }
                                 },
-                                "method":  "post",
-                                "path":  "/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
+                                "method": "post",
+                                "path": "/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
                             }
                         },
-                        "Post_message_in_a_chat_or_channel_2":  {
-                            "runAfter":  {
-                                "Condition_-_revoke_sessions":  [
+                        "Post_message_in_a_chat_or_channel_2": {
+                            "runAfter": {
+                                "Condition_-_revoke_sessions": [
                                     "Failed"
                                 ]
                             },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  {
-                                    "messageBody":  "\u003cp\u003e\u003cspan style=\"font-size: 16px\"\u003e\u003cstrong\u003eActie gefaald: Sessietokens refreshen\u003c/strong\u003e\u003c/span\u003e\u003c/p\u003e",
-                                    "recipient":  "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "messageBody": "<p><span style=\"font-size: 16px\"><strong>Actie gefaald: Sessietokens refreshen</strong></span></p>",
+                                    "recipient": "@triggerBody()?['object']?['properties']?['owner']?['email']"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['teams']['connectionId']"
                                     }
                                 },
-                                "method":  "post",
-                                "path":  "/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
+                                "method": "post",
+                                "path": "/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
                             }
                         },
-                        "Post_message_in_a_chat_or_channel_3":  {
-                            "runAfter":  {
-                                "Condition_-_reset_wachtwoord":  [
+                        "Post_message_in_a_chat_or_channel_3": {
+                            "runAfter": {
+                                "Condition_-_reset_wachtwoord": [
                                     "Failed"
                                 ]
                             },
-                            "type":  "ApiConnection",
-                            "inputs":  {
-                                "body":  {
-                                    "messageBody":  "\u003cp\u003e\u003cspan style=\"font-size: 16px\"\u003e\u003cstrong\u003eActie gefaald: Wachtwoord resetten\u003c/strong\u003e\u003c/span\u003e\u003c/p\u003e",
-                                    "recipient":  "@triggerBody()?['object']?['properties']?['owner']?['email']"
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "body": {
+                                    "messageBody": "<p><span style=\"font-size: 16px\"><strong>Actie gefaald: Wachtwoord resetten</strong></span></p>",
+                                    "recipient": "@triggerBody()?['object']?['properties']?['owner']?['email']"
                                 },
-                                "host":  {
-                                    "connection":  {
-                                        "name":  "@parameters('$connections')['teams']['connectionId']"
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['teams']['connectionId']"
                                     }
                                 },
-                                "method":  "post",
-                                "path":  "/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
+                                "method": "post",
+                                "path": "/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent('Chat with Flow bot')}"
                             }
                         },
-                        "Switch":  {
-                            "runAfter":  {
-                                "Post_adaptive_card_and_wait_for_a_response_2":  [
+                        "Switch": {
+                            "runAfter": {
+                                "Post_adaptive_card_and_wait_for_a_response_2": [
                                     "Succeeded"
                                 ]
                             },
-                            "cases":  {
-                                "Case_-_onderzoek":  {
-                                    "case":  "onderzoek",
-                                    "actions":  {
-                                        "Run_Playbook_Module_2":  {
-                                            "runAfter":  {
-                                            },
-                                            "type":  "ApiConnection",
-                                            "inputs":  {
-                                                "body":  {
-                                                    "AddIncidentComments":  false,
-                                                    "BaseModuleBody":  "@{body('Base_Module')}",
-                                                    "LogicAppResourceId":  "@parameters('InvestigateEntity')",
-                                                    "PlaybookName":  "InvestigateEntity",
-                                                    "TenantId":  "@parameters('tenant')"
+                            "cases": {
+                                "Case_-_onderzoek": {
+                                    "case": "onderzoek",
+                                    "actions": {
+                                        "Run_Playbook_Module_2": {
+                                            "runAfter": {},
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "body": {
+                                                    "AddIncidentComments": false,
+                                                    "BaseModuleBody": "@{body('Base_Module')}",
+                                                    "LogicAppResourceId": "@parameters('InvestigateEntity')",
+                                                    "PlaybookName": "InvestigateEntity",
+                                                    "TenantId": "@parameters('tenant')"
                                                 },
-                                                "host":  {
-                                                    "connection":  {
-                                                        "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                                     }
                                                 },
-                                                "method":  "post",
-                                                "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
-                                                "queries":  {
-                                                    "api-version":  "2016-10-01",
-                                                    "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                                    "sp":  "/triggers/manual/run",
-                                                    "sv":  "1.0"
+                                                "method": "post",
+                                                "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
+                                                "queries": {
+                                                    "api-version": "2016-10-01",
+                                                    "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                    "sp": "/triggers/manual/run",
+                                                    "sv": "1.0"
                                                 }
                                             }
                                         }
                                     }
                                 },
-                                "Case_-_teamsbericht":  {
-                                    "case":  "teams",
-                                    "actions":  {
-                                        "Run_Playbook_Module_3":  {
-                                            "runAfter":  {
-                                            },
-                                            "type":  "ApiConnection",
-                                            "inputs":  {
-                                                "body":  {
-                                                    "AddIncidentComments":  false,
-                                                    "BaseModuleBody":  "@{body('Base_Module')}",
-                                                    "LogicAppResourceId":  "@parameters('TeamsBericht')",
-                                                    "PlaybookName":  "TeamsBericht",
-                                                    "TenantId":  "@parameters('tenant')"
+                                "Case_-_teamsbericht": {
+                                    "case": "teams",
+                                    "actions": {
+                                        "Run_Playbook_Module_3": {
+                                            "runAfter": {},
+                                            "type": "ApiConnection",
+                                            "inputs": {
+                                                "body": {
+                                                    "AddIncidentComments": false,
+                                                    "BaseModuleBody": "@{body('Base_Module')}",
+                                                    "LogicAppResourceId": "@parameters('TeamsBericht')",
+                                                    "PlaybookName": "TeamsBericht",
+                                                    "TenantId": "@parameters('tenant')"
                                                 },
-                                                "host":  {
-                                                    "connection":  {
-                                                        "name":  "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
+                                                "host": {
+                                                    "connection": {
+                                                        "name": "@parameters('$connections')['SentinelTriageAssistant']['connectionId']"
                                                     }
                                                 },
-                                                "method":  "post",
-                                                "path":  "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
-                                                "queries":  {
-                                                    "api-version":  "2016-10-01",
-                                                    "sig":  "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
-                                                    "sp":  "/triggers/manual/run",
-                                                    "sv":  "1.0"
+                                                "method": "post",
+                                                "path": "/workflows/6e68021fa52540d6975742339365ff09/triggers/manual/paths/invoke/func/runplaybook",
+                                                "queries": {
+                                                    "api-version": "2016-10-01",
+                                                    "sig": "oRIkZcdtOkQcUPEaTqPFeLlr_7bkILYWDf5voVpLKG8",
+                                                    "sp": "/triggers/manual/run",
+                                                    "sv": "1.0"
                                                 }
                                             }
                                         }
                                     }
                                 }
                             },
-                            "default":  {
-                                "actions":  {
-                                }
+                            "default": {
+                                "actions": {}
                             },
-                            "expression":  "@body('Post_adaptive_card_and_wait_for_a_response_2')?['data']?['x']",
-                            "type":  "Switch"
+                            "expression": "@body('Post_adaptive_card_and_wait_for_a_response_2')?['data']?['x']",
+                            "type": "Switch"
                         }
                     },
-                    "outputs":  {
-                    }
+                    "outputs": {}
                 },
-                "parameters":  {
-                    "$connections":  {
-                        "value":  {
-                            "SentinelTriageAssistant":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
-                                "connectionName":  "[variables('SentineltriageassistantConnectionName')]",
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "SentinelTriageAssistant": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('SentineltriageassistantConnectionName'))]",
+                                "connectionName": "[variables('SentineltriageassistantConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/customApis/', variables('SentineltriageassistantConnectionName'))]"
                             },
-                            "azuread":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
-                                "connectionName":  "[variables('AzureadConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
+                            "azuread": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
+                                "connectionName": "[variables('AzureadConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
                             },
-                            "azuresentinel":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
-                                "connectionName":  "[variables('MicrosoftSentinelConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
-                                "connectionProperties":  {
-                                    "authentication":  {
-                                        "type":  "ManagedServiceIdentity"
-                                    }
-                                }
-                            },
-                            "keyvault":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('KeyvaultConnectionName'))]",
-                                "connectionName":  "[variables('KeyvaultConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Keyvault')]",
+                            "azuresentinel": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
+                                "connectionName": "[variables('MicrosoftSentinelConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
                                 "connectionProperties": {
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"
                                     }
+                                }
                             },
-                            "teams":  {
-                                "connectionId":  "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
-                                "connectionName":  "[variables('TeamsConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+                            "keyvault": {
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('KeyvaultConnectionName'))]",
+                                "connectionName": "[variables('KeyvaultConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Keyvault')]",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                },
+                                "teams": {
+                                    "connectionId": "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
+                                    "connectionName": "[variables('TeamsConnectionName')]",
+                                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
                                 }
                             }
                         }
                     }
                 }
             },
-            "name":  "[parameters('PlaybookName')]",
-            "type":  "Microsoft.Logic/workflows",
-            "location":  "[resourceGroup().location]",
-            "tags":  {
-                "use case":  "5"
+            "name": "[parameters('PlaybookName')]",
+            "type": "Microsoft.Logic/workflows",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "use case": "5"
             },
-            "identity":  {
-                "type":  "SystemAssigned"
+            "identity": {
+                "type": "SystemAssigned"
             },
-            "apiVersion":  "2017-07-01",
-            "dependsOn":  [
+            "apiVersion": "2017-07-01",
+            "dependsOn": [
                 "[resourceId('Microsoft.Web/connections', variables('AzureadConnectionName'))]",
                 "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
                 "[resourceId('Microsoft.Web/connections', variables('KeyvaultConnectionName'))]",
@@ -1102,66 +1090,67 @@
             ]
         },
         {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('AzureadConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('AzureadConnectionName')]",
-                "customParameterValues":  {
-                },
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('AzureadConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('AzureadConnectionName')]",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuread')]"
                 }
             }
         },
         {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('MicrosoftSentinelConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('MicrosoftSentinelConnectionName')]",
-                "customParameterValues":  {
-                },
-                "parameterValueType":  "Alternative",
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('MicrosoftSentinelConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('MicrosoftSentinelConnectionName')]",
+                "customParameterValues": {},
+                "parameterValueType": "Alternative",
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]"
                 }
             }
         },
         {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('KeyvaultConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('KeyvaultConnectionName')]",
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('KeyvaultConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('KeyvaultConnectionName')]",
                 "customParameterValues": {},
                 "parameterValueSet": {
-                    "name": "managedIdentityAuth",
-                    "values": {}
+                    "name": "oauthMI",
+                    "values": {
+                        "vaultName": {
+                            "value": "[parameters('ResetPassword keyvault name')]"
+                        }
+                    }
                 },
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Keyvault')]"
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Keyvault')]"
                 }
             }
         },
         {
-            "type":  "Microsoft.Web/connections",
-            "apiVersion":  "2016-06-01",
-            "name":  "[variables('TeamsConnectionName')]",
-            "location":  "[resourceGroup().location]",
-            "kind":  "V1",
-            "properties":  {
-                "displayName":  "[variables('TeamsConnectionName')]",
-                "customParameterValues":  {
-                },
-                "api":  {
-                    "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('TeamsConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('TeamsConnectionName')]",
+                "customParameterValues": {},
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
                 }
             }
         }
