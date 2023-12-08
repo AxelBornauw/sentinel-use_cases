@@ -423,6 +423,14 @@
                                     "foreach": "@variables('idsarray')",
                                     "actions": {
                                         "HTTP_2": {
+                                            "runtimeConfiguration": {
+                                                "secureData": {
+                                                    "properties": [
+                                                        "inputs",
+                                                        "outputs"
+                                                    ]
+                                                }
+                                            },
                                             "runAfter": {},
                                             "type": "Http",
                                             "inputs": {
@@ -444,14 +452,6 @@
                                         "HTTP": [
                                             "Succeeded"
                                         ]
-                                    },
-                                    "runtimeConfiguration": {
-                                        "secureData": {
-                                            "properties": [
-                                                "inputs",
-                                                "outputs"
-                                            ]
-                                        }
                                     },
                                     "type": "Foreach"
                                 },
