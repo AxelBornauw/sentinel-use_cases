@@ -15,6 +15,9 @@
         "ResetPassword Client ID":  {
             "type":  "String"
         },
+        "ResetPassword keyvault secret name": {
+            "type": "String"
+        },
         "PlaybookNameTeams":  {
             "type":  "String"
         },
@@ -53,6 +56,10 @@
                         "ResetPassword Client ID":  {
                             "defaultValue":  "[parameters('ResetPassword Client ID')]",
                             "type":  "String"
+                        },
+                        "ResetPassword keyvault secret name": {
+                            "defaultValue": "[parameters('ResetPassword keyvault secret name')",
+                            "type": "String"
                         },
                         "TeamsBericht":  {
                             "defaultValue":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PlaybookNameTeams'))]",
@@ -453,7 +460,7 @@
                                             }
                                         },
                                         "method":  "get",
-                                        "path":  "/secrets/@{encodeURIComponent('ResetPasswordSecret')}/value"
+                                        "path":  "/secrets/@{encodeURIComponent(parameters('ResetPassword keyvault secret name'))}/value"
                                     }
                                 },
                                 "HTTP":  {
@@ -1066,7 +1073,12 @@
                             "teams":  {
                                 "connectionId":  "[resourceId('Microsoft.Web/connections', variables('TeamsConnectionName'))]",
                                 "connectionName":  "[variables('TeamsConnectionName')]",
-                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]"
+                                "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Teams')]",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                }
                             }
                         }
                     }
@@ -1128,7 +1140,10 @@
             "kind":  "V1",
             "properties":  {
                 "displayName":  "[variables('KeyvaultConnectionName')]",
-                "customParameterValues":  {
+                "customParameterValues": {},
+                "parameterValueSet": {
+                    "name": "managedIdentityAuth",
+                    "values": {}
                 },
                 "api":  {
                     "id":  "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Keyvault')]"

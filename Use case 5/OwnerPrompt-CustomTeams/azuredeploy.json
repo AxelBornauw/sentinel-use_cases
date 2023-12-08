@@ -342,12 +342,6 @@
                             }
                         },
                         "Get_blob_content_using_path_(V2)": {
-                            "runAfter": {
-                                "Initialize_variable_-_Blob": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "ApiConnection",
                             "inputs": {
                                 "host": {
                                     "connection": {
@@ -355,13 +349,19 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent(parameters('Storage account name')))}/files",
+                                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent(parameters('Storage account name')))}/GetFileContentByPath",
                                 "queries": {
                                     "inferContentType": false,
                                     "path": "/@{parameters('Storage account blob container name')}/@{variables('Blob')}",
                                     "queryParametersSingleEncoded": true
                                 }
-                            }
+                            },
+                            "runAfter": {
+                                "Initialize_variable_-_Blob": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection"
                         },
                         "Initialize_variable_-_Antwoord": {
                             "runAfter": {
