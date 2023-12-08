@@ -61,7 +61,7 @@
                             "type": "String"
                         },
                         "ResetPassword keyvault secret name": {
-                            "defaultValue": "parameters('ResetPassword keyvault secret name')",
+                            "defaultValue": "[parameters('ResetPassword keyvault secret name')]",
                             "type": "String"
                         },
                         "TeamsBericht": {
