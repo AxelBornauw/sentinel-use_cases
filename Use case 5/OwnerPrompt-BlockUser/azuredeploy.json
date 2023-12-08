@@ -445,11 +445,17 @@
                                             "Succeeded"
                                         ]
                                     },
+                                    "runtimeConfiguration": {
+                                        "secureData": {
+                                            "properties": [
+                                                "inputs",
+                                                "outputs"
+                                            ]
+                                        }
+                                    },
                                     "type": "Foreach"
                                 },
                                 "Get_secret": {
-                                    "runAfter": {},
-                                    "type": "ApiConnection",
                                     "inputs": {
                                         "host": {
                                             "connection": {
@@ -458,15 +464,19 @@
                                         },
                                         "method": "get",
                                         "path": "/secrets/@{encodeURIComponent(parameters('ResetPassword keyvault secret name'))}/value"
-                                    }
+                                    },
+                                    "runAfter": {},
+                                    "runtimeConfiguration": {
+                                        "secureData": {
+                                            "properties": [
+                                                "inputs",
+                                                "outputs"
+                                            ]
+                                        }
+                                    },
+                                    "type": "ApiConnection"
                                 },
                                 "HTTP": {
-                                    "runAfter": {
-                                        "Get_secret": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
                                     "inputs": {
                                         "body": "grant_type=client_credentials&client_id=@{parameters('ResetPassword Client ID')}&client_secret=@{body('Get_secret')?['value']}&scope=https://graph.microsoft.com/.default",
                                         "headers": {
@@ -474,7 +484,21 @@
                                         },
                                         "method": "POST",
                                         "uri": "https://login.microsoftonline.com/@{parameters('tenant')}/oauth2/v2.0/token"
-                                    }
+                                    },
+                                    "runAfter": {
+                                        "Get_secret": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "secureData": {
+                                            "properties": [
+                                                "inputs",
+                                                "outputs"
+                                            ]
+                                        }
+                                    },
+                                    "type": "Http"
                                 },
                                 "Set_variable_3": {
                                     "runAfter": {
