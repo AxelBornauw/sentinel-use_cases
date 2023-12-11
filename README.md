@@ -1,1 +1,3 @@
 # sentinel-use_cases
+Deze Github repo bevat vijf use cases van Azure Logic Apps die dienen om een SOC analist zijn efficiëntie te verbeteren. De eerste 4 cases zijn specfieke incident-gerichte oplossingen voor Savaco en zijn een illustratie hoe veelvoorkomende incidenten makkelijk adhv. Teams berichten snel opgelost kunnen worden.  <br></br>
+De vijfde use case is een Automatische Assistant die via interactieve adaptive Teams cards, een SOC analist een paar opties geeft om een incident makkelijk en snel op te lossen.

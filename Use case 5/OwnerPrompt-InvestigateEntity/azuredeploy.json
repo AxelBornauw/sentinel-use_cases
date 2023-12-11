@@ -1191,25 +1191,6 @@
                                     },
                                     "type": "If"
                                 },
-                                "Condition_-_rdm": {
-                                    "actions": {},
-                                    "runAfter": {
-                                        "Condition_-_relatedip": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "expression": {
-                                        "and": [
-                                            {
-                                                "contains": [
-                                                    "@variables('acties')",
-                                                    "edr"
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    "type": "If"
-                                },
                                 "Condition_-_relatedip": {
                                     "actions": {
                                         "Compose_7": {
@@ -1444,7 +1425,7 @@
                                 },
                                 "Post_message_in_a_chat_or_channel_3": {
                                     "runAfter": {
-                                        "Condition_-_rdm": [
+                                        "Condition_-_relatedip": [
                                             "Succeeded"
                                         ]
                                     },

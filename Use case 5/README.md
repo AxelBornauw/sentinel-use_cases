@@ -1,5 +1,8 @@
 # Use case 5: SOC Automated Assistance
 
+## Omschrijving
+Met de Incident Response Assistant krijgt de SOC analist een tool om een incident sneller en efficiënter op te volgen. De analist krijgt de opties om een entity te onderzoeken, naar een gebruiker een (custom) Teams bericht te sturen of deze gebruiker te blokkeren. Aan de hand van adaptive Teams cards krijgt de analist een interactieve UI waarmee hij snel belangrijke acties of informatie kan opvragen. De Assistant start wanneer iemand zich owner van een incident maakt.
+
 ## Alle playbooks combined
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAxelBornauw%2Fsentinel-use_cases%2Fmain%2FUse%2520case%25205%2FOwnerPrompt-Combined%2Fazuredeploy.json)
 
