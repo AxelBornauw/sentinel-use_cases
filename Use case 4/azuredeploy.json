@@ -72,7 +72,7 @@
                             "inputs": {
                                 "body": {
                                     "incidentArmId": "@triggerBody()?['object']?['id']",
-                                    "message": "\u003cp\u003eTeams message sent to user @{body('Get_user')?['displayName']} - @{body('Get_user')?['mail']} at\u003cbr\u003e\n@{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}.\u003cbr\u003e\nWaiting...\u003c/p\u003e"
+                                    "message": "<p>Teams message sent to user @{body('Get_user')?['displayName']} - @{body('Get_user')?['mail']} at<br>\n@{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}.<br>\nWaiting...</p>"
                                 },
                                 "host": {
                                     "connection": {
@@ -200,7 +200,7 @@
                                     "inputs": {
                                         "body": {
                                             "incidentArmId": "@triggerBody()?['object']?['id']",
-                                            "message": "\u003cp\u003e@{outputs('Get_Logo')}\u003cbr\u003e\nAbuseIPDB IP Checking Results:\u003cbr\u003e\n@{outputs('Compose_2')}\u003c/p\u003e"
+                                            "message": "<p>@{outputs('Get_Logo')}<br>\nAbuseIPDB IP Checking Results:<br>\n@{outputs('Compose_2')}</p>"
                                         },
                                         "host": {
                                             "connection": {
@@ -221,7 +221,7 @@
                                     "inputs": {
                                         "body": {
                                             "incidentArmId": "@triggerBody()?['object']?['id']",
-                                            "message": "\u003cp\u003eGebruiker gaf aan niet verantwoordelijk te zijn voor de log-ins. De automatische triage van STAT berekende een risico score van: @{body('Risk_Scoring_Module')?['TotalScore']}\u003cbr\u003e\n(~3 is normaal). Check de comments voor verdere informatie.\u003c/p\u003e"
+                                            "message": "<p>User claims <strong>not</strong> to be responsible for these logins.. STATs automated triage calculated a risk score of: @{body('Risk_Scoring_Module')?['TotalScore']}<br>\n(~3 is normal). Check the comments for further information.</p>"
                                         },
                                         "host": {
                                             "connection": {
@@ -302,7 +302,7 @@
                                 "Get_Logo": {
                                     "runAfter": {},
                                     "type": "Compose",
-                                    "inputs": "\u003cimg src=\"https://www.abuseipdb.com/img/abuseipdb.png.pagespeed.ce.CI8T6WsXU7.png\"  width=\"152\" height=\"32\"\u003e "
+                                    "inputs": "<img src=\"https://www.abuseipdb.com/img/abuseipdb.png.pagespeed.ce.CI8T6WsXU7.png\"  width=\"152\" height=\"32\"> "
                                 },
                                 "Out_of_Office_Module": {
                                     "runAfter": {
@@ -479,7 +479,7 @@
                                         "inputs": {
                                             "body": {
                                                 "incidentArmId": "@triggerBody()?['object']?['id']",
-                                                "message": "\u003cp\u003eTeams bericht ontvangen om @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')} van @{body('Get_user')?['mail']}.\u003cbr\u003e\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\u003cbr\u003e\nGebruiker geeft aan verantwoordelijk te zijn voor deze logins.\u003cbr\u003e\nReden:\u003cbr\u003e\n@{body('Post_Adaptive_Card_and_wait_for_a_response')?['data']?['reden']}\u003c/p\u003e"
+                                                "message": "<p>Teams message received at @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')} from@{body('Get_user')?['mail']}.<br>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<br>\nUser claims to be responsible for these logins.<br>\nReason:<br>\n@{body('Post_Adaptive_Card_and_wait_for_a_response')?['data']?['reason']}</p>"
                                             },
                                             "host": {
                                                 "connection": {
@@ -671,7 +671,7 @@
                                             "inputs": {
                                                 "body": {
                                                     "isAlert": true,
-                                                    "messageBody": "\u003cp\u003e\u003cspan style=\"font-size: 16px\"\u003e\u003cstrong\u003eREMINDER\u003c/strong\u003e\u003c/span\u003e\u003cbr\u003e\nPlease respond to the question!\u003c/p\u003e",
+                                                    "messageBody": "<p><span style=\"font-size: 16px\"><strong>REMINDER</strong></span><br>\nPlease respond to the question!</p>",
                                                     "recipient": "@body('Get_user')?['mail']"
                                                 },
                                                 "host": {
