@@ -479,7 +479,7 @@
                                         "inputs": {
                                             "body": {
                                                 "incidentArmId": "@triggerBody()?['object']?['id']",
-                                                "message": "<p>Teams message received at @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')} from@{body('Get_user')?['mail']}.<br>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<br>\nUser claims to be responsible for these logins.<br>\nReason:<br>\n@{body('Post_Adaptive_Card_and_wait_for_a_response')?['data']?['reason']}</p>"
+                                                "message": "<p>Teams message received at @{convertTimeZone(utcNow(), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')} from @{body('Get_user')?['mail']}.<br>\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<br>\nUser claims to be responsible for these logins.<br>\nReason:<br>\n@{body('Post_Adaptive_Card_and_wait_for_a_response')?['data']?['reason']}</p>"
                                             },
                                             "host": {
                                                 "connection": {
