@@ -87,7 +87,7 @@
                                     "inputs":  {
                                         "body":  {
                                             "incidentArmId":  "@body('Update_incident')?['id']",
-                                            "message":  "\u003cp\u003e@{variables('usermail')} heeft zijn Sentinel incidenten gesnoozed en deze timer verloopt om:\u003cbr\u003e\n@{variables('EindTijd')}\u003c/p\u003e"
+                                            "message":  "<p>@{variables('usermail')} heeft zijn Sentinel incidenten gesnoozed en deze timer verloopt om:<br>\n@{variables('EindTijd')}</p>"
                                         },
                                         "host":  {
                                             "connection":  {
@@ -240,7 +240,7 @@
                                                         "inputs":  {
                                                             "body":  {
                                                                 "incidentArmId":  "@triggerBody()?['object']?['id']",
-                                                                "message":  "\u003cp\u003e@{variables('usermail')} heeft zijn Sentinel incidenten gesnoozed en deze timer verloopt om:\u003cbr\u003e\n@{variables('EindTijd')}\u003c/p\u003e"
+                                                                "message":  "<p>@{variables('usermail')} heeft zijn Sentinel incidenten gesnoozed en deze timer verloopt om:<br>\n@{variables('EindTijd')}</p>"
                                                             },
                                                             "host":  {
                                                                 "connection":  {
@@ -269,7 +269,7 @@
                                                         "type":  "ApiConnection",
                                                         "inputs":  {
                                                             "body":  {
-                                                                "messageBody":  "\u003cp\u003eSentinel snoozer ingezet.\u003cbr\u003e\n\u003cbr\u003e\n\u003cem\u003eEinde van snoozer\u003c/em\u003e:\u003cbr\u003e\n@{convertTimeZone(addMinutes(utcNow(), variables('minuten')), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}\u003c/p\u003e",
+                                                                "messageBody":  "<p>Sentinel snoozer ingezet.<br>\n<br>\n<em>Einde van snoozer</em>:<br>\n@{convertTimeZone(addMinutes(utcNow(), variables('minuten')), 'UTC', 'Romance Standard Time', 'dd/MM/yyyy HH:mm:ss')}</p>",
                                                                 "recipient":  "@variables('usermail')"
                                                             },
                                                             "host":  {
@@ -290,7 +290,7 @@
                                                         "type":  "ApiConnection",
                                                         "inputs":  {
                                                             "body":  {
-                                                                "messageBody":  "\\u003e\u003cspan style=\"font-size: 18px\"\u003e\u003cstrong\u003eSentinel incident snooze timer verlopen.\u003c/strong\u003e\u003c/span\u003e\u003c/p\u003e",
+                                                                "messageBody":  "<p><span style=\"font-size: 18px\"><strong>Sentinel incident snooze timer verlopen.</strong></span></p>",
                                                                 "recipient":  "@variables('usermail')"
                                                             },
                                                             "host":  {
