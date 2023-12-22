@@ -232,7 +232,7 @@
                                                 "actions":  {
                                                     "Add_comment_to_incident_(V3)_2":  {
                                                         "runAfter":  {
-                                                            "Post_message_in_a_chat_or_channel_2":  [
+                                                            "Post_message_in_a_chat_or_channel":  [
                                                                 "Succeeded"
                                                             ]
                                                         },
@@ -364,7 +364,7 @@
                                                     },
                                                     "Watchlists_-_Delete_a_Watchlist_Item":  {
                                                         "runAfter":  {
-                                                            "Post_message_in_a_chat_or_channel":  [
+                                                            "Add_comment_to_incident_(V3)_2":  [
                                                                 "Succeeded"
                                                             ],
                                                             "Until":  [
@@ -393,7 +393,7 @@
                                                         {
                                                             "greater":  [
                                                                 "@variables('minuten')",
-                                                                0
+                                                                10
                                                             ]
                                                         }
                                                     ]
