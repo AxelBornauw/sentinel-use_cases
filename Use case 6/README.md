@@ -1,6 +1,10 @@
 # Use case 6: Een gebruiker genereerde meer dan 2 incidenten in de laatste 7 dagen en krijgt de mogelijkheid om zijn Sentinel incident te snoozen.
 
 ## Prereq
+- 'NegeerIncident' watchlist met alias 'NegeerIncident' en 3 kolommen (check bestanden):
+    - Naam
+    - ID
+    - EindTijd
 - [STAT modules](https://github.com/briandelmsft/SentinelAutomationModules)
 - Entra ID & Teams connecties autorizeren
 - Playbook 'Microsoft Sentinel Contributor' role geven
